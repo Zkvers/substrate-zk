@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/Users/bun/DoraFactory/zkp/substrate-node-template/target/wasm32-unknown-unknown/debug/build/typenum-596fd8e6aaaa2357/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/Users/bun/DoraFactory/zkp/substrate-node-template/target/wasm32-unknown-unknown/debug/build/typenum-596fd8e6aaaa2357/out/op.rs
