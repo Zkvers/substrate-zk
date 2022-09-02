@@ -1,12 +1,8 @@
 [package]
-authors = [
-    "Sean Bowe <ewillbefull@gmail.com>",
-    "Jack Grigg <thestr4d@gmail.com>",
-]
-description = "zk-SNARK library"
+description = "A zk-SNARK library compatiable with substrate"
 license = "MIT/Apache-2.0"
-name = "bellman"
-version = "0.13.1"
+name = "bellman-verifier"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies.bitvec]
@@ -20,7 +16,7 @@ getrandom = { version = "0.2", features = ["js"] }
 byteorder = { version = "1", default-features = false }
 ff = { version = "0.12" }
 group = { version = "0.12", default-features = false }
-pairing = { version = "0.22", default-features = false }
+pairing = { version = "0.22", optional = true }
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
 	"derive",
 ] }
@@ -42,7 +38,8 @@ rand_xorshift = "0.3"
 sha2 = "0.10"
 
 [features]
-default = ["std"]
+default = ["std", "groth16"]
+groth16 = ["pairing"]
 std = [
     "rand_core/std",
     "byteorder/std",

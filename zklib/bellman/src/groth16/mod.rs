@@ -1,19 +1,18 @@
 //! The [Groth16] proving system.
 //!
 //! [Groth16]: https://eprint.iacr.org/2016/260
+use codec::alloc::sync::Arc;
 
 use group::{prime::PrimeCurveAffine, GroupEncoding, UncompressedEncoding};
 use pairing::{Engine, MultiMillerLoop};
-
 use crate::SynthesisError;
-
 use crate::multiexp::SourceBuilder;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
-use std::io::{self, Read, Write};
-use std::sync::Arc;
 
-#[cfg(test)]
-mod tests;
+use sp_std::prelude::*;
+
+//TODO: remove or change reader/writer function without using io
+use std::io::{self, Read, Write};
 
 mod generator;
 mod prover;
@@ -398,10 +397,8 @@ impl<E: Engine> Parameters<E> {
     }
 }
 
-// bellman验证时需要用到的verification key
 pub struct PreparedVerifyingKey<E: MultiMillerLoop> {
     /// Pairing result of alpha*beta
-    /// alpha1和beta2的配对结果
     alpha_g1_beta_g2: E::Gt,
     /// -gamma in G2
     neg_gamma_g2: E::G2Prepared,

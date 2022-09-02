@@ -17,12 +17,16 @@ scale-info = { version = "2.1.1", default-features = false, features = ["derive"
 frame-support = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.25"}
 frame-system = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.25" }
 frame-benchmarking = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.25", optional = true }
-rand = { version = "0.4", default-features = false }
-bls12_381 = { version = "0.7.0", default-features = false }
-pairing = { version =  "0.22.0", default-features = false }
-bellman = { version = "0.13.1"}
-group = { version = "0.12.0" }
-ff = { version = "0.12.0", default-features = false }
+
+# zk lib
+bellman-verifier = { path = "../../zklib/bellman" }
+rand_core = { version = "0.6", default-features = false }
+getrandom = { version = "0.2", features = ["js"] }
+byteorder = { version = "1", default-features = false }
+ff = { version = "0.12" }
+group = { version = "0.12", default-features = false }
+pairing = { version = "0.22", default-features = false }
+bls12_381 = {version = "0.7", default-features = false }
 
 [dev-dependencies]
 sp-core = { default-features = false, version = "6.0.0", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.25" }
@@ -37,12 +41,9 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"frame-benchmarking/std",
-	"rand/std",
-	# "bls12_381/std",
-	# "pairing/std",
+	"rand_core/std",
+    "byteorder/std",
 	# "bellman/std",
-	# "group/std",
-	"ff/std",
 ]
 
 runtime-benchmarks = ["frame-benchmarking/runtime-benchmarks"]

@@ -1,13 +1,8 @@
+use codec::alloc::sync::Arc;
+use sp_std::ops::{ MulAssign, AddAssign };
+
 use rand_core::RngCore;
 
-#[cfg(feature = "std")]
-use std::sync::Arc;
-
-#[cfg_attr(not(feature = "std"), no_std )]
-use alloc::sync::Arc;
-
-#[cfg_attr(not(feature = "std"), no_std )]
-use alloc::string::String;
 use sp_std::prelude::*;
 
 use ff::{Field, PrimeField};

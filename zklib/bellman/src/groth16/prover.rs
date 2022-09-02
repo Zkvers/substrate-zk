@@ -1,6 +1,16 @@
 use rand_core::RngCore;
-use std::ops::{AddAssign, MulAssign};
-use std::sync::Arc;
+#[cfg_attr(not(feature = "std"), no_std )]
+
+#[cfg(not(feature = "std"))]
+#[macro_use]
+extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
+use codec::alloc::sync::Arc;
+use sp_std::ops::{ AddAssign, MulAssign };
+use sp_std::prelude::*;
 
 use ff::{Field, PrimeField, PrimeFieldBits};
 use group::{prime::PrimeCurveAffine, Curve};

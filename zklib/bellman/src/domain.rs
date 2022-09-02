@@ -11,6 +11,10 @@
 //! [`EvaluationDomain`]: crate::domain::EvaluationDomain
 //! [Groth16]: https://eprint.iacr.org/2016/260
 
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
+use sp_std::prelude::*;
 use ff::PrimeField;
 use group::cofactor::CofactorCurve;
 

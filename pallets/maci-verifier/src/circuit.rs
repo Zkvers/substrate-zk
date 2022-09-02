@@ -1,6 +1,6 @@
 use ff::PrimeField;
 
-use bellman::{Circuit, ConstraintSystem, SynthesisError};
+use bellman_verifier::{Circuit, ConstraintSystem, SynthesisError};
 
 pub const MIMC_ROUNDS: usize = 322;
 
