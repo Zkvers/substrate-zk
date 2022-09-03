@@ -20,10 +20,7 @@ frame-benchmarking = { default-features = false, version = "4.0.0-dev", git = "h
 sp-std = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.25" }
 
 # zk lib
-# bellman-verifier = { path = "../../zk-verifier" }
-# rand_core = { version = "0.6", default-features = false }
-# getrandom = { version = "0.2", features = ["js"] }
-# byteorder = { version = "1", default-features = false }
+bellman-verifier = { path = "../../zk-verifier", default-features = false}
 # ff = { version = "0.12" }
 # group = { version = "0.12" }
 # pairing = { version = "0.22", default-features = false }
@@ -38,8 +35,7 @@ std = [
 	"frame-system/std",
 	"frame-benchmarking/std",
 	"sp-std/std",
-	# "rand_core/std",
-    # "byteorder/std",
+	"bellman-verifier/std",
 ]
 
 runtime-benchmarks = ["frame-benchmarking/runtime-benchmarks"]

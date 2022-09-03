@@ -1,9 +1,10 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 use group::{prime::PrimeCurveAffine, Curve};
 use pairing::{MillerLoopResult, MultiMillerLoop};
+use super::{PreparedVerifyingKey, Proof, VerifyingKey, VerificationError};
 
 use sp_std::ops::{AddAssign, Neg};
-
-use super::{PreparedVerifyingKey, Proof, VerifyingKey, VerificationError};
 
 pub fn prepare_verifying_key<E: MultiMillerLoop>(vk: &VerifyingKey<E>) -> PreparedVerifyingKey<E> {
 

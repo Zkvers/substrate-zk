@@ -2,9 +2,6 @@
 
 pub use pallet::*;
 
-/* mod circuit;
-use circuit::*; */
-
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::pallet_prelude::*;
@@ -12,7 +9,7 @@ pub mod pallet {
 
 	use sp_std::vec;
 	use sp_std::vec::Vec;
-	// use bellman_verifier::groth16::{ Proof, VerifyingKey};
+	use bellman_verifier::{ Proof, VerifyingKey};
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -30,7 +27,7 @@ pub mod pallet {
 
 	// 上链的是Vec<u8>类型
 	#[pallet::storage]
-	#[pallet::getter(fn create_proof)]
+	#[pallet::getter(fn proof)]
 	pub type Pof<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, Vec<u8>, OptionQuery>;
 
 	#[pallet::event]

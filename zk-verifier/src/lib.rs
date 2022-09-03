@@ -1,9 +1,10 @@
-
-use sp_std::sync::Arc;
+#![cfg_attr(not(feature = "std"), no_std)]
 
 use group::{prime::PrimeCurveAffine, GroupEncoding, UncompressedEncoding};
 use pairing::{Engine, MultiMillerLoop};
+
 use codec::{ Encode, Decode };
+use sp_std::sync::Arc;
 use sp_std::prelude::*;
 
 mod verifier;
@@ -134,23 +135,6 @@ pub enum SynthesisError {
     /// During CRS generation, we observed an unconstrained auxiliary variable
     UnconstrainedVariable,
 }
-
-impl SynthesisError {
-    #[inline]
-    fn description_str(&self) -> &'static str {
-        match *self {
-            SynthesisError::AssignmentMissing => "an assignment for a variable could not be computed",
-            SynthesisError::DivisionByZero => "division by zero",
-            SynthesisError::Unsatisfiable => "unsatisfiable constraint system",
-            SynthesisError::PolynomialDegreeTooLarge => "polynomial degree is too large",
-            SynthesisError::UnexpectedIdentity => "encountered an identity element in the CRS",
-            SynthesisError::IoError => "encountered an I/O error",
-            SynthesisError::MalformedVerifyingKey => "malformed verifying key",
-            SynthesisError::UnconstrainedVariable => "auxillary variable was unconstrained"
-        }
-    }
-}
-
 
 /// An error during verification.
 #[derive(Debug, Clone)]
