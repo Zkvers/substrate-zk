@@ -3,7 +3,7 @@ members = [
     "node",
     "pallets/*",
     "runtime",
-    "zklib/*",
+    # "zk-verifier",
 ]
 [profile.release]
 panic = "unwind"

@@ -1,4 +1,4 @@
-use ff::PrimeField;
+/* use ff::PrimeField;
 
 use bellman_verifier::{Circuit, ConstraintSystem, SynthesisError};
 
@@ -114,3 +114,4 @@ impl<'a, S: PrimeField> Circuit<S> for MiMCDemo<'a, S> {
         Ok(())
     }
 }
+ */

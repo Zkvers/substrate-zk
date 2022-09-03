@@ -266,7 +266,7 @@ impl pallet_template::Config for Runtime {
 	type Event = Event;
 }
 
-impl pallet_maci_verifier::config for Runtime {
+impl pallet_maci_verifier::Config for Runtime {
 	type Event = Event;
 }
 
@@ -287,6 +287,7 @@ construct_runtime!(
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
+		MaciVerifier: pallet_maci_verifier,
 	}
 );
 
