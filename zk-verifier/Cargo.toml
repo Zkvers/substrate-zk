@@ -5,11 +5,6 @@ name = "bellman-verifier"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies.bitvec]
-version = "1"
-default-features = false
-features = ["atomic", "alloc"]
-
 [dependencies]
 group = { version = "0.12", default-features = false }
 pairing = { version = "0.22", default-features = false }

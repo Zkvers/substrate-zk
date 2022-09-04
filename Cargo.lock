@@ -382,7 +382,6 @@ dependencies = [
 name = "bellman-verifier"
 version = "0.1.0"
 dependencies = [
- "bitvec",
  "group 0.12.0",
  "pairing",
  "parity-scale-codec",
@@ -553,6 +552,19 @@ dependencies = [
  "fastrand",
  "futures-lite",
  "once_cell",
+]
+
+[[package]]
+name = "bls12_381"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62250ece575fa9b22068b3a8d59586f01d426dd7785522efd97632959e71c986"
+dependencies = [
+ "ff 0.12.0",
+ "group 0.12.0",
+ "pairing",
+ "rand_core 0.6.3",
+ "subtle",
 ]
 
 [[package]]
@@ -1474,6 +1486,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df689201f395c6b90dfe87127685f8dbfc083a5e779e613575d8bd7314300c3e"
 dependencies = [
+ "bitvec",
  "rand_core 0.6.3",
  "subtle",
 ]
@@ -2064,6 +2077,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7391856def869c1c81063a03457c676fbcd419709c3dfb33d8d319de484b154d"
 dependencies = [
+ "byteorder",
  "ff 0.12.0",
  "rand_core 0.6.3",
  "subtle",
@@ -4094,9 +4108,13 @@ name = "pallet-maci-verifier"
 version = "4.0.0-dev"
 dependencies = [
  "bellman-verifier",
+ "bls12_381",
+ "ff 0.12.0",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "log",
+ "pairing",
  "parity-scale-codec",
  "scale-info",
  "sp-std",
