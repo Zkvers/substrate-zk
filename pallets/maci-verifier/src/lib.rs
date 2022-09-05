@@ -11,10 +11,10 @@ use parser::{parse_proof, parse_vkey};
 pub mod pallet {
 	use crate::{ProofStr, VkeyStr};
 	use crate::{parse_proof, parse_vkey};
-	use bellman_verifier::{Proof, VerifyingKey, prepare_verifying_key, verify_proof};
+	use bellman_verifier::{prepare_verifying_key, verify_proof};
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
-	use sp_std::{vec, vec::Vec};
+	use sp_std::vec::Vec;
 	use bls12_381::Bls12;
 	use ff::PrimeField as Fr;
 
@@ -41,7 +41,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ProofStored(ProofStr, T::AccountId),
 		VerificationKeyStore(VkeyStr, T::AccountId),
-		VerificationPassed(),
+		VerificationPassed(T::AccountId),
 	}
 
 	#[pallet::error]
@@ -53,7 +53,6 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-
 		#[pallet::weight(0)]
 		pub fn generate_proof_vkey(
 			origin: OriginFor<T>,
@@ -103,7 +102,7 @@ pub mod pallet {
 							let pvk =  prepare_verifying_key(&vkey);
 
 							match verify_proof(&pvk, &proof, &[Fr::from_str_vartime("33").unwrap()]) {
-								Ok(()) => Self::deposit_event(Event::<T>::VerificationPassed()),
+								Ok(()) => Self::deposit_event(Event::<T>::VerificationPassed(who)),
 								Err(e) => { 
 									log::info!("{:?}", e);
 									()

@@ -1,6 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use group::{prime::PrimeCurveAffine, GroupEncoding, UncompressedEncoding};
 use pairing::{Engine, MultiMillerLoop};
 
 use codec::{ Encode, Decode };
