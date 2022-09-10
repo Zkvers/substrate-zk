@@ -389,6 +389,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bellman-verifier"
+version = "0.1.0"
+source = "git+https://github.com/DoraFactory/snarkjs-bellman-adapter.git#a2fa051f77b38b6970e68963e3b2d6a6395aee18"
+dependencies = [
+ "group 0.12.0",
+ "pairing",
+ "parity-scale-codec",
+ "sp-std",
+]
+
+[[package]]
 name = "bimap"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3839,6 +3850,7 @@ dependencies = [
  "pallet-balances",
  "pallet-grandpa",
  "pallet-maci-verifier",
+ "pallet-multisig",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
  "pallet-template",
@@ -4107,7 +4119,7 @@ dependencies = [
 name = "pallet-maci-verifier"
 version = "4.0.0-dev"
 dependencies = [
- "bellman-verifier",
+ "bellman-verifier 0.1.0 (git+https://github.com/DoraFactory/snarkjs-bellman-adapter.git)",
  "bls12_381",
  "ff 0.12.0",
  "frame-benchmarking",
@@ -4117,6 +4129,19 @@ dependencies = [
  "pairing",
  "parity-scale-codec",
  "scale-info",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-multisig"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-io",
+ "sp-runtime",
  "sp-std",
 ]
 
