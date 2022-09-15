@@ -21,3 +21,4 @@ you can use this [adapter](https://github.com/DoraFactory/snarkjs-bellman-adapte
 i will show a minimal example with this [circuit](https://github.com/DoraFactory/snarkjs-bellman-adapter/tree/main/circuit): `a*b=c`.
 - you can call the function `generate_proof_vkey` of `pallet-maci-verifier` to store `proof` and `verification key`
 - call the `verifier` function to verify the proof
+- attention to the `sp-std` version
