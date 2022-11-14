@@ -43,7 +43,8 @@ where
 	let vk_beta_2 = vk.beta_2;
 	let vk_gamma_2 = vk.gamma_2;
 	let vk_delta_2 = vk.delta_2;
-	let vk_ic = vk.ic;
+	let vk_ic0 = vk.ic0;
+	let vk_ic1 = vk.ic1;
 
 	let mut alpha1: [u8; 96] = [0; 96];
 	let mut beta2: [u8; 192] = [0; 192];
@@ -69,12 +70,12 @@ where
 		delta2[i] = vk_delta_2[i];
 	}
 
-	for i in 0..vk_ic[0].len() {
-		ic_0[i] = vk_ic[0][i];
+	for i in 0..vk_ic0.len() {
+		ic_0[i] = vk_ic0[i];
 	}
 
-	for i in 0..vk_ic[1].len() {
-		ic_1[i] = vk_ic[1][i];
+	for i in 0..vk_ic1.len() {
+		ic_1[i] = vk_ic1[i];
 	}
 
 	let alpha1_affine = G1Affine::from_uncompressed(&alpha1).unwrap();

@@ -1,7 +1,7 @@
 [package]
-name = "pallet-maci-verifier"
+name = "pallet-verifier"
 version = "4.0.0-dev"
-description = "a pallet for the maci verification"
+description = "a pallet for the zkp verification"
 authors = ["DoraFactory"]
 edition = "2021"
 publish = false
@@ -25,7 +25,6 @@ bellman-verifier = { path = "../../zk-verifier", default-features = false}
 ff = { version = "0.12" }
 pairing = { version = "0.22", default-features = false }
 bls12_381 = {version = "0.7" }
-
 # log
 log = "0.4.17"
 
