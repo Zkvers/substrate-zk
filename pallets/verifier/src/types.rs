@@ -14,5 +14,6 @@ pub struct VkeyStr {
     pub beta_2: Vec<u8>,
     pub gamma_2: Vec<u8>,
     pub delta_2: Vec<u8>,
-    pub ic: Vec<Vec<u8>>,
+    pub ic0: Vec<u8>,
+    pub ic1: Vec<u8>,
 }

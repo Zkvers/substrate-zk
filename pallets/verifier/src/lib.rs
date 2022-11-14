@@ -14,13 +14,14 @@ pub mod pallet {
 	use bellman_verifier::{prepare_verifying_key, verify_proof};
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
+	use codec::{Encode, Decode};
 	use sp_std::vec::Vec;
 	use bls12_381::Bls12;
 	use ff::PrimeField as Fr;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
-		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
 	#[pallet::pallet]
@@ -63,16 +64,25 @@ pub mod pallet {
 			vk_beta_2: Vec<u8>,
 			vk_gamma_2: Vec<u8>,
 			vk_delta_2: Vec<u8>,
-			vk_ic: Vec<Vec<u8>>,
+			vk_ic0: Vec<u8>,
+			vk_ic1: Vec<u8>,
 		) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-			let proof = ProofStr { pi_a: proof_a, pi_b: proof_b, pi_c: proof_c };
+			let who = ensure_signed(origin)?;	
+
+			log::info!("{:?}", &proof_a);
+
+			let proof = ProofStr { 
+				pi_a: proof_a,
+				pi_b: proof_b, 
+				pi_c: proof_c 
+			};
 			let vkey = VkeyStr {
 				alpha_1: vk_alpha1, 
 				beta_2: vk_beta_2,
 				gamma_2: vk_gamma_2,
 				delta_2: vk_delta_2,
-				ic: vk_ic,
+				ic0: vk_ic0,
+				ic1: vk_ic1,
 			};
 			<Pof<T>>::insert(who.clone(), &proof);
 			<Vkey<T>>::insert(who.clone(),&vkey);
