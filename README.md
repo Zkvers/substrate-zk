@@ -17,8 +17,8 @@ run the chain:
 ```
 
 ## Test the zk-verifier
-First, you need use this  [adapter](https://github.com/DoraFactory/snarkjs-bellman-adapter) to generate proof(`proof_hex.json`) and verification(`vkey_hex.json`).
-i will show a minimal example with this [circuit](https://github.com/DoraFactory/snarkjs-bellman-adapter/tree/main/circuit): `a*b=c`.
+First, you need use this  [adapter](https://github.com/ZK-Space/snarkjs-bellman-adapter) to generate proof(`proof_hex.json`) and verification(`vkey_hex.json`).
+i will show a minimal example with this [circuit](https://github.com/ZK-Space/snarkjs-bellman-adapter/tree/main/circuit): `a*b=c`.
 - you can call the function `generate_proof_vkey` of `pallet-verifier` to store `proof` and `verification key`(pass the hex data)
 - call the `verifier` function to verify the proof
 - attention to the `sp-std` version
