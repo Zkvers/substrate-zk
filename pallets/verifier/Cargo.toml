@@ -20,8 +20,7 @@ frame-benchmarking = { default-features = false, version = "4.0.0-dev", git = "h
 sp-std = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.31" }
 
 # zk lib
-bellman-verifier = { path = "../../zk-verifier", default-features = false}
-# bellman-verifier = { git = "https://github.com/DoraFactory/snarkjs-bellman-adapter.git", default-features = false, version = "0.1.0"}
+bellman-verifier = { path = "../../bellman-verifier", default-features = false}
 ff = { version = "0.12" }
 pairing = { version = "0.22", default-features = false }
 bls12_381 = {version = "0.7" }

@@ -3,7 +3,7 @@ members = [
     "node",
     "pallets/*",
     "runtime",
-    "zk-verifier",
+    "bellman-verifier",
 ]
 [profile.release]
 panic = "unwind"
