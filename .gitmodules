@@ -1,0 +1,3 @@
+[submodule "snarkjs-bellman-adapter"]
+	path = snarkjs-bellman-adapter
+	url = https://github.com/ZK-Space/snarkjs-bellman-adapter
