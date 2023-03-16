@@ -23,7 +23,7 @@ run the chain:
 
 ## Test Bellman-verifier
 ### Generate Proof
-First of all, you need to use `snarkjs-bellman-adapter` in the root directory of this project to generate proof(`proof_hex.json`) and verification(`vkey_hex.json`). Please refer to the README for the detailed generation process.
+First of all, you need to use `snarkjs-bellman-adapter` in the root directory of this project to generate proof(`proof_hex.json`) and verification(`vkey_hex.json`). Please refer to the [README](https://github.com/Zkvers/snarkjs-bellman-adapter/blob/main/README.md) for the detailed generation process.
 I will show a minimal example with this circuit: `a*b=c`.
 ### Verify Proof on substarte-zk 
 - call the function `generate_proof_vkey` of `pallet-verifier` to store `proof` and `verification key`(pass the hex data).
