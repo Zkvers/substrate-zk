@@ -392,6 +392,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "bellman"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4dd656ef4fdf7debb6d87d4dd92642fcbcdb78cbf6600c13e25c87e4d1a3807"
+dependencies = [
+ "bitvec",
+ "blake2s_simd",
+ "byteorder",
+ "crossbeam-channel",
+ "ff 0.12.1",
+ "group 0.12.1",
+ "lazy_static",
+ "log",
+ "num_cpus",
+ "pairing",
+ "rand_core 0.6.4",
+ "rayon",
+ "subtle",
+]
+
+[[package]]
 name = "bellman-verifier"
 version = "0.1.0"
 dependencies = [
@@ -399,6 +420,20 @@ dependencies = [
  "pairing",
  "parity-scale-codec",
  "sp-std",
+]
+
+[[package]]
+name = "bellman-verify"
+version = "0.1.0"
+dependencies = [
+ "bellman",
+ "bls12_381",
+ "ff 0.12.1",
+ "group 0.12.1",
+ "pairing",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

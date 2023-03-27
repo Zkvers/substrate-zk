@@ -4,6 +4,7 @@ members = [
     "pallets/*",
     "runtime",
     "bellman-verifier",
+    "snarkjs-bellman-adapter/verify",
 ]
 [profile.release]
 panic = "unwind"

@@ -1,6 +1,7 @@
 use codec::{Encode, Decode};
 use frame_support::RuntimeDebug;
 use sp_std::vec::Vec;
+
 #[derive(Clone, Encode, Decode, Default, PartialEq, RuntimeDebug, scale_info::TypeInfo)]
 pub struct ProofStr {
     pub pi_a: Vec<u8>,
