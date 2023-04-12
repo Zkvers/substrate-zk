@@ -1,16 +1,28 @@
 use super::{ProofStr, VkeyStr};
 use bellman_verifier::{Proof, VerifyingKey};
 use bls12_381::{G1Affine, G2Affine};
+use frame_support::ensure;
 use pairing::Engine;
 use sp_std::vec::Vec;
 
-pub fn parse_proof<E>(pof: ProofStr) -> Proof<E>
+#[derive(Debug)]
+pub enum InvalidCreation {
+	ErrorProof,
+	ErrorVerificationKey
+}
+
+/// convert the proof into the affine type, which will be used to verify
+pub fn parse_proof<E>(pof: ProofStr) -> Result<Proof<E>, InvalidCreation> 
 where
 	E: Engine<G1Affine = G1Affine, G2Affine = G2Affine>,
 {
 	let pi_a = pof.pi_a;
 	let pi_b = pof.pi_b;
 	let pi_c = pof.pi_c;
+
+	ensure!(pi_a.len() == 96, InvalidCreation::ErrorProof);
+	ensure!(pi_b.len() == 192, InvalidCreation::ErrorProof);
+	ensure!(pi_c.len() == 96, InvalidCreation::ErrorProof);
 
 	let mut a_arr: [u8; 96] = [0; 96];
 	let mut b_arr: [u8; 192] = [0; 192];
@@ -28,14 +40,20 @@ where
 		c_arr[i] = pi_c[i];
 	}
 
-	let pia_affine = G1Affine::from_uncompressed(&a_arr).unwrap();
-	let pib_affine = G2Affine::from_uncompressed(&b_arr).unwrap();
-	let pic_affine = G1Affine::from_uncompressed(&c_arr).unwrap();
+	let pia_affine = G1Affine::from_uncompressed(&a_arr);
+	let pib_affine = G2Affine::from_uncompressed(&b_arr);
+	let pic_affine = G1Affine::from_uncompressed(&c_arr);
 
-	Proof { a: pia_affine, b: pib_affine, c: pic_affine }
+	ensure!(pia_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorProof);
+	ensure!(pib_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorProof);
+	ensure!(pic_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorProof);
+
+	Ok(Proof { a: pia_affine.unwrap(), b: pib_affine.unwrap(), c: pic_affine.unwrap() })
 }
 
-pub fn parse_vkey<E>(vk: VkeyStr) -> VerifyingKey<E>
+
+/// convert the verification key into the affine type, which will be used in verification
+pub fn parse_vkey<E>(vk: VkeyStr) ->  Result<VerifyingKey<E>, InvalidCreation>
 where
 	E: Engine<G1Affine = G1Affine, G2Affine = G2Affine>,
 {
@@ -45,6 +63,13 @@ where
 	let vk_delta_2 = vk.delta_2;
 	let vk_ic0 = vk.ic0;
 	let vk_ic1 = vk.ic1;
+
+	ensure!(vk_alpha_1.len() == 96, InvalidCreation::ErrorVerificationKey);
+	ensure!(vk_beta_2.len() == 192, InvalidCreation::ErrorVerificationKey);
+	ensure!(vk_gamma_2.len() == 192, InvalidCreation::ErrorVerificationKey);
+	ensure!(vk_delta_2.len() == 192, InvalidCreation::ErrorVerificationKey);
+	ensure!(vk_ic0.len() == 96, InvalidCreation::ErrorVerificationKey);
+	ensure!(vk_ic1.len() == 96, InvalidCreation::ErrorVerificationKey);
 
 	let mut alpha1: [u8; 96] = [0; 96];
 	let mut beta2: [u8; 192] = [0; 192];
@@ -78,22 +103,32 @@ where
 		ic_1[i] = vk_ic1[i];
 	}
 
-	let alpha1_affine = G1Affine::from_uncompressed(&alpha1).unwrap();
-	let beta2_affine = G2Affine::from_uncompressed(&beta2).unwrap();
-	let gamma2_affine = G2Affine::from_uncompressed(&gamma2).unwrap();
-	let delta2_affine = G2Affine::from_uncompressed(&delta2).unwrap();
-	let ic0_affine = G1Affine::from_uncompressed(&ic_0).unwrap();
-	let ic1_affine = G1Affine::from_uncompressed(&ic_1).unwrap();
-	ic.push(ic0_affine);
-	ic.push(ic1_affine);
+	let alpha1_affine = G1Affine::from_uncompressed(&alpha1);
+	let beta2_affine = G2Affine::from_uncompressed(&beta2);
+	let gamma2_affine = G2Affine::from_uncompressed(&gamma2);
+	let delta2_affine = G2Affine::from_uncompressed(&delta2);
+	let ic0_affine = G1Affine::from_uncompressed(&ic_0);
+	let ic1_affine = G1Affine::from_uncompressed(&ic_1);
 
-	VerifyingKey {
-		alpha_g1: alpha1_affine,
+	// ensure the format of verification key is correct, otherwaise, it can not be converted into affine type
+	ensure!(alpha1_affine.is_some().unwrap_u8() == 1, InvalidCreation::ErrorVerificationKey);
+	ensure!(beta2_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorVerificationKey);
+	ensure!(gamma2_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorVerificationKey);
+	ensure!(delta2_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorVerificationKey);
+	ensure!(ic0_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorVerificationKey);
+	ensure!(ic1_affine.is_some().unwrap_u8()== 1, InvalidCreation::ErrorVerificationKey);
+
+	ic.push(ic0_affine.unwrap());
+	ic.push(ic1_affine.unwrap());
+
+	// return verification key
+	Ok(VerifyingKey {
+		alpha_g1: alpha1_affine.unwrap(),
 		beta_g1: G1Affine::identity(),
-		beta_g2: beta2_affine,
-		gamma_g2: gamma2_affine,
+		beta_g2: beta2_affine.unwrap(),
+		gamma_g2: gamma2_affine.unwrap(),
 		delta_g1: G1Affine::identity(),
-		delta_g2: delta2_affine,
+		delta_g2: delta2_affine.unwrap(),
 		ic,
-	}
+	})
 }

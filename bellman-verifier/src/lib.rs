@@ -10,6 +10,7 @@ mod verifier;
 
 pub use self::verifier::*;
 
+// proof will be used to verify
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Clone, Encode, Decode, Default, Eq)]
 pub struct Proof<E: Engine> {
@@ -24,6 +25,7 @@ impl<E: Engine> PartialEq for Proof<E> {
     }
 }
 
+/// verification key will be used in verification
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Clone)]
 pub struct VerifyingKey<E: Engine> {

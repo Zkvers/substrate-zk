@@ -7,6 +7,12 @@ pub mod types;
 use parser::{parse_proof, parse_vkey};
 use types::{ProofStr, VkeyStr};
 
+#[cfg(test)]
+mod mock;
+
+#[cfg(test)]
+mod tests;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use crate::{parse_proof, parse_vkey, ProofStr, VkeyStr};
@@ -31,15 +37,15 @@ pub mod pallet {
 	#[pallet::without_storage_info]
 	pub struct Pallet<T>(_);
 
-	/// Store thr pr
+	/// Store the proof
 	#[pallet::storage]
-	// #[pallet::getter(fn proof_store)]
 	pub type Pof<T: Config> = StorageValue<_, ProofStr, ValueQuery>;
 
+	/// store the verification key
 	#[pallet::storage]
-	// #[pallet::getter(fn vkey_store)]
 	pub type Vkey<T: Config> = StorageValue<_, VkeyStr, ValueQuery>;
 
+	/// store the public signal
 	#[pallet::storage]
 	pub type PubSignal<T: Config> = StorageValue<_, PublicSignalStr, ValueQuery>;
 
@@ -54,17 +60,19 @@ pub mod pallet {
 
 	#[pallet::error]
 	pub enum Error<T> {
+		/// incorrect verification key format
+		ErrorVerificationKey,
+		/// incorrect proof format
+		ErrorProof,
+		/// incorrect public signal format
+		ErrorPublicSignal,
 		/// If you want to verify the proof, but there is no Verification key
 		NoVerificationKey,
-		/// Upload none proof(No proof to verify)
-		NoProof,
-		/// upload none public signal(no public signal to verify)
+		/// no public signal to verify
 		NoPublicSignal,
-		/// invalid verification key
-		InvalidVerificationKey,
-		/// invalid public signal
-		InvalidPublic,
-		/// verification failed with invalid proof
+		/// parse error with public signal
+		ParsePulbicSignalError,
+		/// invalid proof
 		InvalidProof,
 	}
 
@@ -93,6 +101,12 @@ pub mod pallet {
 				ic1: vk_ic1,
 			};
 
+			// ensure valid public signal, public should not be none
+			ensure!(public_signal.len() != 0, Error::<T>::ErrorPublicSignal);
+
+			// ensure the verification key's format is correct
+			let _ = parse_vkey::<Bls12>(vkey.clone()).map_err(|_| Error::<T>::ErrorVerificationKey)?;
+
 			<PubSignal<T>>::put(&public_signal);
 			<Vkey<T>>::put(&vkey);
 
@@ -102,11 +116,8 @@ pub mod pallet {
 		}
 
 		/// verify the proof of snarkjs with groth16(bellman verification)
-
-		// TODO: add a argument with `proof`, we need to pass proof to verify
-		// TODO: need to adjust the verification procedure
 		#[pallet::weight(0)]
-		pub fn verify_proof(
+		pub fn verify(
 			origin: OriginFor<T>,
 			proof_a: Vec<u8>,
 			proof_b: Vec<u8>,
@@ -115,66 +126,26 @@ pub mod pallet {
 			let who = ensure_signed(origin)?;
 			let public_signal = PubSignal::<T>::get();
 			let vkeystr = Vkey::<T>::get();
-			if public_signal.len() == 0 {
-				return Err(Error::<T>::NoPublicSignal.into())
-			} else if proof_a.is_empty() || proof_b.is_empty() || proof_c.is_empty() {
-				return Err(Error::<T>::InvalidProof.into())
-			} else if proof_a.is_empty() && proof_b.is_empty() && proof_b.is_empty() {
-				return Err(Error::<T>::NoProof.into())
-			} else {
-				match Some(&vkeystr) {
-					Some(VkeyStr { alpha_1: _, beta_2: _, gamma_2: _, delta_2: _, ic0: _, ic1: _ }) => {
-						let pof = ProofStr { pi_a: proof_a, pi_b: proof_b, pi_c: proof_c };
-						let proof = parse_proof::<Bls12>(pof.clone());
-						let vkey = parse_vkey::<Bls12>(vkeystr);
 
-						let pvk = prepare_verifying_key(&vkey);
-						// if let 
-						let public_str =
-							from_utf8(&public_signal).map_err(|_| Error::<T>::InvalidPublic)?;
+			let pof = ProofStr { pi_a: proof_a, pi_b: proof_b, pi_c: proof_c };
 
-						// verify the proof
-						match verify_proof(
-							&pvk,
-							&proof,
-							&[Fr::from_str_vartime(public_str).unwrap()],
-						) {
-							Ok(()) => Self::deposit_event(Event::<T>::VerificationPassed(who.clone())),
-							Err(e) => {
-								match e {
-									VerificationError::InvalidVerifyingKey =>
-										return Err(Error::<T>::InvalidVerificationKey.into()),
-									VerificationError::InvalidProof =>
-										return Err(Error::<T>::InvalidProof.into()),
-								};
-							},
-						};
-						Self::deposit_event(Event::<T>::ProofStored(who, pof));
-					},
-					None => {
-						return Err(Error::<T>::NoVerificationKey.into())
-					},
-				}
-			}
+			// parse proof and verification key
+			let proof = parse_proof::<Bls12>(pof.clone()).map_err(|_| Error::<T>::ErrorProof)?;
+			let vkey = parse_vkey::<Bls12>(vkeystr).map_err(|_| Error::<T>::ErrorVerificationKey)?;
+			
+			// prepare pre-verification key
+			let pvk = prepare_verifying_key(&vkey);
+
+			// prepare signal
+			let public_str = from_utf8(&public_signal).map_err(|_| Error::<T>::ParsePulbicSignalError)?;
+
+			// verify the proof
+			ensure!(verify_proof(&pvk, &proof, &[Fr::from_str_vartime(public_str).unwrap()]).is_ok(), Error::<T>::InvalidProof);
+
+			Self::deposit_event(Event::<T>::VerificationPassed(who.clone()));
+			Self::deposit_event(Event::<T>::ProofStored(who, pof));
+
 			Ok(())
 		}
-
-		//TODO: verify the proof of bellman with groth16 directly(bellman verification)
-		/* 		#[pallet::weight(0)]
-		pub fn bellman_verifier(origin: OriginFor<T>) -> DispatchResult{
-			let who = ensure_signed(origin)?;
-			match verify_proof(&pvk, &proof, &[Fr::from_str_vartime("33").unwrap()]) {
-				Ok(()) => Self::deposit_event(Event::<T>::VerificationPassed(who)),
-				Err(e) => {
-					// Err(Error::<T>::VerificationFailed.into())
-					match e {
-						VerificationError::InvalidVerifyingKey => Err(Error::<T>::InvalidVerificationKey.into()),
-						VerificationError::InvalidProof => Err(Error::<T>::InvalidProof.into()),
-					}
-					()
-				}
-			}
-			Ok(())
-		} */
 	}
 }
