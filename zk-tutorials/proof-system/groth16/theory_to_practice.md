@@ -234,3 +234,36 @@ Great! If you see the above fig, which means your proof passed the verification!
 After running the previous example, we now have a basic understanding of the zk-SNARK execution process. 
 
 In this example, we will introduce a more advanced example: `verify the correctness of a Merkle tree using zk-SNARKs`. This is the simplest example of implementing `rollup`. The specific circuit can be found in `substrate-zk/snarkjs-bellman-adaper/circuit/MerkleTree`, which provides a detailed introduction to the circuit. If you want to run the example, the method is the same as the first Multiplication example.
+
+
+- First, generate `input.json` for the Merkle tree
+  go into the dir `snarkjs-bellman-adapter/circuit/MerkleTree` and run with: 
+  ```shell
+  npm install && node generate_merkle_root_input.js
+  ```
+
+- Generate proof and verification key with `circuit.circom` and `inputs.json` in the dir `circuit` of this project by `start.sh`. And then generate the the uncompressed hex format proof and verification key.
+```
+cd ../../ && ./start.sh MerkleTree
+cd prove && npm install
+cd src && node adapter.js MerkleTree
+cd ../../verify/src/adapter
+CIRCUIT_DIR_NAME=MerkleTree PUBLIC_INPUT=0 cargo test snark_proof_bellman_verify -- --nocapture
+``````
+
+In this case, out public input is "0". If you see the below output, which means the verification with bellman passed.
+
+```
+running 1 test
+THE CIRCUIT YOU ARE TESTING IS : MerkleTree
+PUBLIC INPUT is : 0
+>>>>start encode the uncompressed data to Affine<<<<<
+>>>>end verification<<<<<<<
+test adapter::snark_proof_bellman_verify ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+```
+
+If you want to learn more about circuit implementation, you can refer to the documentation in `snarkjs-bellman-adapter/circuit/MerkleTree/README.md`, which provides detailed explanations.
+
+If you want to verify this proof on the chain, the process is the same as the Multiplication circuit above.

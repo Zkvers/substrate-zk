@@ -7,7 +7,7 @@ A Substrate-based chain supporting `ZK-SNARK` verification.
 git clone --recurse-submodules https://github.com/Zkvers/substrate-zk
 ```
 
-## Env
+## Environment
 Rust version:   
 ```
 1.65.0-aarch64-apple-darwin (default)  
