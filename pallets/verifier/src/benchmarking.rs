@@ -1,7 +1,7 @@
 #![cfg(feature = "runtime-benchmarks")]
 
 use super::*;
-use frame_benchmarking::{account, benchmarks, impl_benchmark_test_suite, whitelisted_caller};
+use frame_benchmarking::{benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
 use crate::Pallet as Verifier;
 
@@ -12,8 +12,6 @@ benchmarks! {
 	set_zk_keys_benchmark {
         let caller: T::AccountId = whitelisted_caller();
         let origin = RawOrigin::Signed(caller.clone());
-
-        // let origin = RuntimeOrigin::signed(call.clone()).into();
 
 		    let public_signal = b"33".to_vec();
 
