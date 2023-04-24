@@ -24,7 +24,7 @@ pub mod pallet {
 	use crate::{parse_proof, parse_vkey, ProofStr, VkeyStr};
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
-	use frame_system::WeightInfo;
+	// use frame_system::WeightInfo;
 	use core::str::from_utf8;
 	use sp_std::vec::Vec;
 
