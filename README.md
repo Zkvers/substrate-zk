@@ -10,8 +10,8 @@ git clone --recurse-submodules https://github.com/Zkvers/substrate-zk
 ## Environment
 Rust version:   
 ```
-1.65.0-aarch64-apple-darwin (default)  
-rustc 1.65.0 (897e37553 2022-11-02)
+nightly-2023-03-13-aarch64-apple-darwin (default)
+rustc 1.70.0-nightly (7b4f48927 2023-03-12)
 ```
 ## Zero knowledge proof and verification on Substrate-based chain
 In this project, we have theory and practice in Zero knowledge proof, Mainly description exists in `proof system` directory and [README](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md) of `zk-tutorial` dir and the [README](https://github.com/Zkvers/snarkjs-bellman-adapter/blob/main/README.md) of `snarkjs-bellman-adapter`
