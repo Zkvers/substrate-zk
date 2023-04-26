@@ -28,17 +28,11 @@ where
 	let mut b_arr: [u8; 192] = [0; 192];
 	let mut c_arr: [u8; 96] = [0; 96];
 
-	for i in 0..pi_a.len() {
-		a_arr[i] = pi_a[i];
-	}
+	a_arr[..pi_a.len()].copy_from_slice(&pi_a[..]);
 
-	for i in 0..pi_b.len() {
-		b_arr[i] = pi_b[i];
-	}
+	b_arr[..pi_b.len()].copy_from_slice(&pi_b[..]);
 
-	for i in 0..pi_c.len() {
-		c_arr[i] = pi_c[i];
-	}
+	c_arr[..pi_c.len()].copy_from_slice(&pi_c[..]);
 
 	let pia_affine = G1Affine::from_uncompressed(&a_arr);
 	let pib_affine = G2Affine::from_uncompressed(&b_arr);
@@ -79,29 +73,17 @@ where
 	let mut ic_1: [u8; 96] = [0; 96];
 	let mut ic = Vec::new();
 
-	for i in 0..vk_alpha_1.len() {
-		alpha1[i] = vk_alpha_1[i];
-	}
+	alpha1[..vk_alpha_1.len()].copy_from_slice(&vk_alpha_1[..]);
 
-	for i in 0..vk_beta_2.len() {
-		beta2[i] = vk_beta_2[i];
-	}
+	beta2[..vk_beta_2.len()].copy_from_slice(&vk_beta_2[..]);
 
-	for i in 0..vk_gamma_2.len() {
-		gamma2[i] = vk_gamma_2[i];
-	}
+	gamma2[..vk_gamma_2.len()].copy_from_slice(&vk_gamma_2[..]);
 
-	for i in 0..vk_delta_2.len() {
-		delta2[i] = vk_delta_2[i];
-	}
+	delta2[..vk_delta_2.len()].copy_from_slice(&vk_delta_2[..]);
 
-	for i in 0..vk_ic0.len() {
-		ic_0[i] = vk_ic0[i];
-	}
+	ic_0[..vk_ic0.len()].copy_from_slice(&vk_ic0[..]);
 
-	for i in 0..vk_ic1.len() {
-		ic_1[i] = vk_ic1[i];
-	}
+	ic_1[..vk_ic1.len()].copy_from_slice(&vk_ic1[..]);
 
 	let alpha1_affine = G1Affine::from_uncompressed(&alpha1);
 	let beta2_affine = G2Affine::from_uncompressed(&beta2);

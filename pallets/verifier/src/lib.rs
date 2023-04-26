@@ -110,7 +110,7 @@ pub mod pallet {
 			};
 
 			// ensure valid public signal, public should not be none
-			ensure!(public_signal.len() != 0, Error::<T>::ErrorPublicSignal);
+			ensure!(!public_signal.is_empty(), Error::<T>::ErrorPublicSignal);
 
 			// ensure the verification key's format is correct
 			let _ = parse_vkey::<Bls12>(vkey.clone()).map_err(|_| Error::<T>::ErrorVerificationKey)?;
@@ -119,7 +119,7 @@ pub mod pallet {
 			<Vkey<T>>::put(&vkey);
 
 			Self::deposit_event(Event::<T>::PublicSignalStored(who.clone(), public_signal));
-			Self::deposit_event(Event::<T>::VerificationKeyStored(who.clone(), vkey));
+			Self::deposit_event(Event::<T>::VerificationKeyStored(who, vkey));
 			Ok(())
 		}
 
