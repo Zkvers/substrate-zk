@@ -16,11 +16,11 @@ zkSNARKs can be used to prove and verify, in zero-knowledge, the integrity of co
 * **Soundness** - the proof is computationally sound (i.e., it is infeasible to fake a proof of a false NP statement). Such a proof system is also called an argument.
 * **Proof of knowledge** - the proof attests not just that the NP statement is true, but also that the prover knows why (e.g., knows a valid qux).
 
-Together, these properties comprise a zkSNARK, which stands for a Zero-Knowledge Succinct Non-interactive ARgument of Knowledge.
+Together, these properties comprise a zkSNARK, which stands for a **Z**ero-**K**nowledge **S**uccinct **N**on-interactive **A**rgument of **K**nowledge.
 
-Some theories mentioned above may be boring, we can use a simple scenario to illustrate ZKSNARK: Alice wants to prove to Bob that a `house(public signal)` belongs to her. How can she prove it to Bob without showing him the `key(private input)`? Alice just needs to ask Bob to turn around while she opens the door to the house. Then, she asks Bob to turn back and show him that `the door is now open(statement)`. This proves that the house belongs to Alice. In this process, Alice has not revealed any part related to her key, so it is non-interactive.
+Some theories mentioned above may be boring, we can use a simple scenario to illustrate ZKSNARK: Alice wants to prove to Bob that a `house(public signal)` belongs to her. How can she prove it to Bob without showing him the `key(private input)` of house? Alice just needs to ask Bob to turn around while she opens the door to the house. Then, she asks Bob to turn back and show him that `the door is now open(statement)`. This proves that the house belongs to Alice. In this process, Alice has not revealed any part related to her key, so it is non-interactive.
 
-With the above scenario, we can go back to the NP problem mentioned earlier. For someone without the key(`without a private input`) to a house, the problem of opening the door to the house is `an intractable problem in polynomial time`. However, once a known solution is discovered (the door has been opened), a verifier can `verify in polynomial time` whether the solution is correct. This is the essence of ZK SNARKS. Later on, we will elaborate on this core idea with some slightly theoretical knowledge.
+In the above scenario, we can return to the NP problem mentioned earlier. For someone without the key (`without a private input`), the problem of opening a door is essentially `an intractable problem in polynomial time`. However, once a known solution is discovered (i.e., the door has been opened), a verifier can `confirm the correctness of this solution in polynomial time`. This is the essence of ZK-SNARKs. Later on, we will delve deeper into this core concept with some slightly more theoretical knowledge.
 
 
 ## How to construct ZK SNARKS?
@@ -64,35 +64,32 @@ The role of R1CS is to act as an intermediate representation, converting arithme
 The main reason for converting arithmetic circuits to R1CS is to simplify the proof generation process. In ZKSNARKs, generating a proof requires transforming the arithmetic circuit into a set of constraint systems and processing them with some specific numbers, such as random numbers. Directly converting the arithmetic circuit into a constraint system may result in a cumbersome proof generation process that requires significant computing resources. Converting arithmetic circuits to R1CS can simplify the proof generation process and make proof generation more efficient.
 
 ## Convert R1CS to QAP
-In ZKSNARKs, R1CS is a constraint system used to represent arithmetic circuits. However, directly using R1CS for proofs is not practical as it requires a lot of computing resources and memory, and also requires the prover to generate and handle a large amount of random numbers. Therefore, to simplify the proof process, we need to further transform R1CS into a more compact form. This is where QAP (Quadratic Arithmetic Program) comes in.
+In ZKSNARKs, R1CS is a constraint system used to represent arithmetic circuits. However, directly using R1CS for proofs is not practical as it requires a lot of computing resources and memory. R1CS is a way of describing arithmetic circuits where each gate of the circuit is described as a linear constraint. Although this format is intuitive, it can lead to overly complex and inefficient processing and verification.Therefore, to simplify the proof process, we need to further transform R1CS into a more compact form. This is where QAP (Quadratic Arithmetic Program) comes in.
 
 QAP is a more compact representation that converts the linear constraints in R1CS into quadratic constraints, which are more compact and easier to handle, and can be processed using efficient mathematical techniques such as polynomial evaluation.
 
-The conversion process from R1CS to QAP can be divided into several steps:
-- Convert each constraint in R1CS into a quadratic constraint. Specifically, for each constraint in R1CS, such as $Ax + By + Cz = 0$, we can convert it into a quadratic constraint, i.e., $(Ax + By + Cz)(Dx + Ey + Fz) = Q$, where $D$, $E$, $F$, and $Q$ are polynomials to be solved.
+* **Mapping from R1CS to QAP**: The first step is to map each constraint of R1CS to the format of QAP. For each constraint of R1CS, such as A * B - C = 0, we need to construct three polynomials $A(x)$, $B(x)$, $C(x)$ such that for all i, $A(i) * B(i) - C(i) = 0$.
 
-- Merge all quadratic constraints into one polynomial. Add all quadratic constraints together and eliminate common variables, obtaining a polynomial in the form of $P(x,y,z) = G(x)H(y) - L(z)$, where $G$, $H$, and $L$ are polynomials to be solved.
+* **Constructing the target polynomial**: After constructing the polynomials $A(x)$, $B(x)$, $C(x)$, we create a target polynomial $Z(x)$ whose roots include the solution to the R1CS constraint.
 
-- Split the polynomial $P(x,y,z)$ into two polynomials $T(x,y,z)$ and $Z(x)$. During the splitting process, we can group each term in the polynomial $P(x,y,z)$ according to the power of variables, resulting in a combination of polynomials $T(x,y,z)$ and $Z(x)$, where $T(x,y,z)$ only contains high-degree terms of $x$, $y$, and $z$, and $Z(x)$ only contains low-degree terms of $x$.
+* **Constructing auxiliary polynomials**: We then construct two auxiliary polynomials $L(x)$ and $R(x)$. Each term of these polynomials corresponds to a term on the left and right sides (i.e., $A$ and $B$) of the R1CS constraint.
 
-- Convert the polynomials $T(x,y,z)$ and $Z(x)$ into polynomials in the FFT domain. By using the FFT algorithm, we can convert the polynomials $T(x,y,z)$ and $Z(x)$ into polynomials in the FFT domain, which can be efficiently processed using the properties of the FFT algorithm.
+* **Verification**: Finally, we verify that these polynomials satisfy the relation $A(x) * B(x) - C(x) = H(x) * Z(x)$, where $H(x)$ is an auxiliary polynomial. If this relation holds, then we have proved the original R1CS constraint.
 
-By following these steps, we can convert R1CS to QAP and transform the polynomials $T(x,y,z)$ and $Z(x)$ into polynomials in the FFT domain, enabling efficient processing of polynomial operations using the FFT algorithm. QAP is a more compact representation form that can greatly simplify the proof process and improve the efficiency and scalability of proofs.
+By following these steps, we can convert R1CS to QAP. QAP is a more compact representation form that can greatly simplify the proof process and improve the efficiency and scalability of proofs.
 
 ## Generate proof
-In ZK SNARKS, the process of generating a proof is typically performed using the proof algorithm of a zero-knowledge proof system, which allows a prover to prove the truth of a statement or assertion to a verifier without revealing any other information about the statement or assertion.
+In ZK-SNARKS, the process of generating a proof is typically performed using the proof algorithm of a zero-knowledge proof system, which allows a prover to prove the truth of a statement or assertion to a verifier without revealing any other information about the statement or assertion.
 
 The process of generating a proof includes the following steps:
 
-- Input transformation: The statement or assertion is transformed into a set of constraints on a common reference string.
-- Proof construction: The prover constructs a proof that satisfies these constraints by selecting appropriate random values and performing calculations.
-- Proof verification: The verifier uses the common reference string, the statement or assertion, and the proof to verify the correctness of the proof.
+- **Computing witness**: For a statement that needs to be proven, the prover first needs to compute a solution that satisfies the statement. This solution is also known as a `witness`.
+
+- **Generating QAP**: The prover transforms the statement into an R1CS (Rank 1 Constraint System), and then converts the R1CS into a `QAP` (Quadratic Arithmetic Program).
+
+- **Generating proof**: Using the witness and QAP, the prover generates a proof by performing a series of computations. This `proof` contains elements such as the evaluation of polynomials and values at specific points.
 
 In this process, the key to generating a proof is how the prover constructs the proof. The prover needs to select appropriate random values and use them to calculate some values that satisfy the constraints and generate the proof.
-
-In ZK SNARKS, proof construction typically uses Quadratic Arithmetic Program (QAP), which transforms the statement or assertion into a set of polynomial constraints on the common reference string, which can be used to construct the proof.
-
-The prover uses these polynomial constraints and their random values to calculate other polynomials, and compares these calculation results with the values of some special points. If these comparison results satisfy certain conditions, the prover can generate a proof that satisfies the polynomial constraints.
 
 The process of generating a proof is a crucial step in ZKSNARKS, as it determines the security and efficiency of the proof system.
 
@@ -101,6 +98,6 @@ In ZK SNARKs, the process of verifying a proof typically uses the verification a
 
 The process of verifying a proof includes the following steps:
 - Input checking: The verifier checks whether the input conforms to the required format.
-- Public reference string checking: The verifier checks whether the public reference string is the same as the one used in the proof generation process.
-- Proof verification: The verifier uses the public reference string, the statement or assertion, and the proof to verify the correctness of the proof. This process typically involves transforming the polynomial constraints into some special vectors and matrices and using some special algorithms for vector and matrix operations.
-- Output decision: Based on the result of the proof, the verifier decides whether to accept the truthfulness of the statement or assertion.
+- Public reference string checking: The verifier checks whether the common reference string is consistent with the one used to generate the proof.
+- Proof verification: The verifier uses the common reference string, the statement, and the proof to verify its correctness. This process typically involves operations on vectors and matrices.
+- Output decision: Based on the verification result of the proof, the verifier decides whether to accept the truthfulness of the statement. If the proof passes the verification, the verifier accepts the truthfulness of the statement. Otherwise, the verifier rejects the truthfulness of the statement.
