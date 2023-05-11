@@ -41,47 +41,92 @@ Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS I
 10. Verifier 𝓥 reconstructs the division relation on elliptic curve discrete logarithm points, verifies the correctness of vector $\vec{s}$, but does not know vector $\vec{s}$.
 
 
-### Initialization of CRS
+## Initialization of CRS
 
-* Random $\tau$ chosen during trusted setup as well as $\alpha$, $\beta$
-* $n$ is number of gates.
-* $u_i$, $v_i$ and $w_i$ are the QAP polynomials created from the R1CS circuit
+During the setup phase, we randomly select the following elements (all of which are toxic waste):$\alpha$, $\beta$, $\gamma$, $\delta$, $\tau$.
 
-$CRS: \{g_1^\alpha\, g_1^\beta, g_1^\delta, \{\{ g_1^{\tau^i}\}, \{g_1^{\alpha \tau^i}\}, \{g_1^{\beta \tau^i}\}\}_{i=0}^{n-1}, \{g_1^{\beta u_i(\tau) + \alpha v_i(\tau) + w_i(\tau)}\}_{i=0}^n\}, \{g_1^{\frac{\tau^it(x)}{\delta}}\}_{i=0}^{n-1},\\g_2^\beta, g_2^\delta, \{g_2^{\tau ^i}\}_{i=0}^{n-1}\}$
-> $g_1$ is the generator of $G_1$, $g_2$ is the generator of $G_2$
+Given:
+* A computation with $m$ variables, where $l$ variables are public inputs.
+* $n$ constraint equations $Z(X)$.
+* According to the QAP definition, $Z(X)=(X-1)\cdot(X-2)\cdot(X-3)\cdot\dots$
+* $L_i(X) = \beta\cdot A_i(X) + \alpha\cdot B_i(X) + C_i(X)$
 
 The CRS (Common Reference String) is divided into two sets. The part needed for proving is denoted as `PK (Proving Key)`, and the part needed for verification is denoted as `VK (Verification Key)`.
 
-### Prover
-**Settings**:
-* Regular proof is $\pi = (A, B, C)$. 
-* $l+1$ is number of public inputs (+1 as first public input is "1" in R1CS)
-* Vector of `public inputs` $\phi = (a_0, \dots, a_{l})$
+### Proving key
+* Values related to G1:
+$$(\alpha, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1}, L_{l+1}(\tau)/\delta, L_{l+2}(\tau)/\delta, \dots, L_m(\tau)/\delta, Z(\tau)/\delta, \tau\cdot Z(\tau)/\delta, \tau^2\cdot Z(\tau)/\delta, \dots, \tau^{n-2}\cdot Z(\tau)/\delta)_{1}$$
 
-**Extension**: 
-Prover computes the regular proof and computes the following additionally 
-* $S = g_1^{\sum_{i=0}^{l} a_i (\beta u_i(\tau) + \alpha v_i(\tau) + w_i(\tau))}$ 
-> Construct linear combination relationships, and place the coefficients of the combined polynomial on the elliptic curve discrete logarithm points, forming a discrete logarithm problem that is difficult to solve.
-* Derive random challenge $z = H(\phi, \pi, S)$
-* Compute the three following elements.
-    * $U = g_2^{\sum_{i=0}^l a_i ( \frac{u_i(\tau) - u_i(z)}{\tau - z})}$
-    * $V = g_2^{\sum_{i=0}^l a_i ( \frac{v_i(\tau) - v_i(z)}{\tau - z})}$
-    * $W = g_2^{\sum_{i=0}^l a_i ( \frac{w_i(\tau) - w_i(z)}{\tau - z})}$
+* Values related to G2:
+$$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$
 
-* Proof is $(\pi, S, U , V , W)$
+The proof key will also include the coefficients of the polynomials $A_1(X)$, $A_2(X)$, $A_3(X)$, $\dots$, $B_1(X)$, $B_2(X)$, $B_3(X)$, $\dots$, and $C_1(X)$, $C_2(X)$, $C_3(X)$, $\dots$, as well as the polynomial $Z(X)$.
 
-### Verifier
-* Compute the following three elements $u_z, v_z, w_z \in \mathbb{F_r}$:
-    * $u_z = \sum_{i=0}^l u_i(z)$
-    * $v_z = \sum_{i=0}^l v_i(z)$
-    * $w_z = \sum_{i=0}^l w_i(z)$
-* Check **as usual**
-    * $e(A,B) = e(g_1^\alpha, g_2^\beta)e(S,g2)e(C,g2^\delta)$
-* Check public input construction
-    * $e(Sg_1^{-\beta u_z -\alpha v_z -w_z},g_2) = e(g_1^{\beta \tau - \beta z}, U)e(g_1^{\alpha \tau - \alpha z},V)e(g_1^{\tau - z},W)$
-    * These computations are done using the CRS
+### Verification key
+* Values related to G1: $(1, L_0(\tau)/\gamma, L_1(\tau)/\gamma, L_2(\tau)/\gamma, \dots, L_l(\tau)/\gamma)_{1}$
 
-The CRS of Groth16 consists of very specific polynomials 𝑊(𝑥), 𝑈(𝑥), 𝑉(𝑥) that are equivalent to the R1CS constraints. Advantages: The prover 𝒫 can generate the proof using the polynomials 𝑊(𝑥), 𝑈(𝑥), 𝑉(𝑥) directly from the CRS, resulting in a fast verification. Disadvantages: The polynomials 𝑊(𝑥), 𝑈(𝑥), 𝑉(𝑥) in this CRS are derived from R1CS constraints and are fixed, which means that they can only express a unique circuit and their expressive power is relatively limited to other circuits.
+* Values related to G2: $(1, \gamma, \delta)_{2}$
+
+* Values related to Gt: $(\alpha_{1}\cdot\beta_{2})^{t}$
+
+> $g_1$ is the generator of $G_1$, $g_2$ is the generator of $G_2$
+
+## Proof generation
+
+Given a witness vector $w = (1, w_1, w_2, w_3, …, w_m )$, and two random field elements r and s, a **proof** is made of three points $A$, $B$ and $C$:
+* A is a point in G1:
+
+$A_1 = \alpha_1 + w_0A_0(\tau)_1 + w_1A_1(\tau)_1 + w_2A_2(\tau)_1 + w_3A_3(\tau)_1 + \dots + w_mA_m(\tau)_1 + r\delta_1$
+
+>All elements in this equation are elements of G1(The subscript number in the lower right corner is used for identification), eg:$\alpha_1 = \alpha \cdot g_1$, $A_0(\tau)_1 = A_0(\tau) \cdot g_1$ , $A_1(\tau)_1 = A_1(\tau) \cdot g_1$ and so on.
+
+$A_i(\tau)\cdot g_1$ can be calculated from the coefficients of $A_i(X)$ by multiplying each coefficient with the corresponding term $g_1, \tau\cdot g_1, \tau^2\cdot g_1, \ldots$, which are points made available by the CRS (common reference string).
+
+* B is a point in G2:
+
+$B_2 = \beta_2 + w_0B_0(\tau)_2 + w_1B_1(\tau)_2 + w_2B_2(\tau)_2 + w_3B_3(\tau)_2 + \dots + w_mB_m(\tau)_2 + s\delta_2$
+
+
+* C is a point in G1:
+
+$C_1 = w_{l+1}\cdot(L_{l+1}(\tau)/\delta)_1 + \dots + w_m\cdot(L_m(\tau)/\delta)_1 + H(\tau)\cdot(Z(\tau)/\delta)_1 + s\cdot A_1 + r\cdot B_1 - r\cdot s\cdot \delta_1$
+
+$H(\tau)\cdot Z(\tau)/\delta \cdot g_1$ can be calculated from the coefficients of $H(X)$ by multiplying each coefficient with the corresponding term $(Z(\tau)/\delta) \cdot g_1, (\tau\cdot Z(\tau)/\delta) \cdot g_1,(\tau^2\cdot Z(\tau)/\delta) \cdot g_1, \ldots$, which are points made available by the CRS (common reference string).
+
+The polynomial $H(X)$ can be calculated by first computing the polynomials $A(X)$, $B(X)$, and $C(X)$ using the witness vector $w$ on the polynomials $A_1(X), A_2(X), A_3(X), \ldots,$ $B_1(X), B_2(X), B_3(X), \ldots$, and $C_1(X), C_2(X), C_3(X), \ldots$, provided by the CRS. As we recall from the QAP post, $H(X) = [A(X) \cdot B(X) - C(X)] / Z(X)$.
+
+We also need to calculate $B$ in $G1$: $B_1 = \beta_1 + w_0B_0(\tau)_1 + w_1B_1(\tau)_1 + \dots + w_mB_m(\tau)_1 + s\delta_1$.
+
+
+## Proof Verification
+
+To verify a proof, we just need to check the following equality:
+
+$A_1 \cdot B_2 = \alpha_1 \cdot \beta_2 + (w_0L_0(\tau)/y + w_1L_1(\tau)/y + \dots + w_lL_l(\tau)/y)_1 \cdot y_2 + C_1 \cdot \delta_2$
+
+This requires only three pairings, considering that $\alpha_1 \cdot \beta_2$ is already available in the verifying key.
+
+* the left term $A \cdot B$:
+
+$[\alpha + A(\tau) + r\delta] \cdot [\beta + B(\tau) + s\delta]$
+
+$= \alpha \cdot \beta + \alpha \cdot B(\tau) + s\alpha\delta + A(\tau) \cdot \beta + A(\tau) \cdot B(\tau) + sA(\tau)\delta + r\delta \cdot \beta + r\delta \cdot B(\tau) + s \cdot r\delta\delta$
+
+$= A(\tau) \cdot B(\tau) + \alpha \cdot \beta + \alpha \cdot B(\tau) + \beta \cdot A(\tau) + s\alpha\delta + sA(\tau)\delta + r\beta\delta + rB(\tau)\delta + s \cdot r\delta\delta$
+
+* the right term:
+
+$\alpha \cdot \beta + L(\tau) + H(\tau) \cdot Z(\tau) + s\alpha\delta + sA(\tau)\delta + s \cdot r\delta\delta + r\beta\delta + rB(\tau) \cdot \delta + s \cdot r\delta\delta - r \cdot s\delta\delta$
+
+$= \alpha \cdot \beta + \beta \cdot A(\tau) + \alpha \cdot B(\tau) + C(\tau) + H(\tau) \cdot Z(\tau) + s\alpha\delta + sA(\tau)\delta + s \cdot r\delta\delta + r\beta\delta + rB(\tau) \cdot \delta$
+
+$= C(\tau) + H(\tau) \cdot Z(\tau) + \alpha \cdot \beta + \alpha \cdot B(\tau) + \beta \cdot A(\tau) + s\alpha\delta + sA(\tau)\delta + r\beta\delta + rB(\tau) \cdot \delta + s \cdot r\delta\delta$
+
+If the above equality holds, it means that:
+
+$A(\tau) \cdot B(\tau) = C(\tau) + H(\tau) \cdot Z(\tau)$
+
+Ok, verify successfully.
 
 ## Practice1: Multilication
 In the first example, we start with the simplest `multiplication` case "a * b = c". The public input is `c`, and the prover needs to prove to someone else that he know two values `a` and `b`, whose product is c, without revealing the values of a and b. You can go to directory `substrate-zk/snarkjs-bellman-adapter` to refer to its readme, complete `Pre-requirements` and `Use the adapter` section, and then come back here. I will explain to you what happens in the process and then show you how to verify the proof generated by snarkjs on our substrate-based chain with bellman.
