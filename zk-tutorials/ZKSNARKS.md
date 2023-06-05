@@ -63,14 +63,14 @@ The main reason for converting arithmetic circuits to R1CS is to simplify the pr
 
 Next, we will explain what R1CS (Rank-1 Constraint System) is using a simple [example](https://medium.com/@VitalikButerin/quadratic-arithmetic-programs-from-zero-to-hero-f6d558cea649) writen by Vitalik.
 ![flatten](./img/flatten.jpg)
-- Computational Problem(As show in the above fig with `Original Conputation`): proving that you know the solution to a cubic equation: x**3 + x + 5 == 35 (hint: the answer is 3)
-- High-level language: If we were to express this computational problem in a high-level programming language, its form would be:
+- **Computational Problem**(As show in the above fig with `Original Conputation`): proving that you know the solution to a cubic equation: x**3 + x + 5 == 35 (hint: the answer is 3)
+- **High-level language**: If we were to express this computational problem in a high-level programming language, its form would be:
     ```
     def qeval(x):
         y = x**3
         return x + y + 5
     ```
-- Flattening: Of course, as mentioned earlier, the problem formulation in the high-level programming language cannot be directly used for ZKSNARKs. We first need to transform this computational logic into the form of a circuit with gates. We need to us gate to construct a circuit that can represent the computational problem where `gate: x = y(op) z; op = +,-,*/`. All intermediate states in the computational problem need to be expressed in the form of gates, as shown in the above diagram.
+- **Flattening**: Of course, as mentioned earlier, the problem formulation in the high-level programming language cannot be directly used for ZKSNARKs. We first need to transform this computational logic into the form of a circuit with gates. We need to use gates to construct circuit that can represent the computational problem where `gate: x = y(op) z; op = +,-,*/`. All intermediate states in the computational problem need to be expressed in the form of gates, as shown in the above diagram.
     ```
     sym_1 = x * x
     y = sym_1 * x
@@ -80,7 +80,7 @@ Next, we will explain what R1CS (Rank-1 Constraint System) is using a simple [ex
 
 At this point, we have learned how to transform a simple computational problem into a representation form of a circuit with gates. The next step is to understand the key aspects of R1CS. we convert gates into something called a rank-1 constraint system (R1CS).
 
-An R1CS is a sequence of groups of three vectors $(a, b, c)$, and the solution to an R1CS is a vector $s$, where $s$ must satisfy the equation $s . a * s . b - s . c = 0$, where . represents the dot product - in simpler terms, if we "zip together" $a$ and $s$, multiplying the two values in the same positions, and then take the sum of these products, then do the same to $b$ and $s$ and then $c$ and $s$, then the third result equals the product of the first two results. 
+An R1CS is a sequence of groups of three vectors $(a, b, c)$, and the solution to an R1CS is a vector $s$, where $s$ must satisfy the equation $s·a * s·b - s·c = 0$, where · represents the dot product - in simpler terms, if we "zip together" $a$ and $s$, multiplying the two values in the same positions, and then take the sum of these products, then do the same to $b$ and $s$ and then $c$ and $s$, then the third result equals the product of the first two results. 
 
 For example, this is a satisfied R1CS for the gate `sym_1 = x * x`:  
 ![constraint01](./img/constraint01.jpg)
@@ -179,9 +179,9 @@ QAP implements the exact same logic except using polynomials instead of dot prod
 
 By following these steps, we can convert R1CS to QAP. QAP is a more compact representation form that can greatly simplify the proof process and improve the efficiency and scalability of proofs.
 
-For the above example in R1CS, We go from four groups of three vectors of length six to six groups of three degree-3 polynomials, where evaluating the polynomials at each x coordinate represents one of the constraints. That is, if we evaluate the polynomials at x=1, then we get our first set of vectors, if we evaluate the polynomials at x=2, then we get our second set of vectors, and so on. We can make this transformation using something called a `Lagrange interpolation`. For each x coordinate, we can create a polynomial that has the desired y coordinate at that x coordinate and a y coordinate of 0 at all the other x coordinates we are interested in, and then to get the final result we add all of the polynomials together. 
+For the above example in R1CS, We go from four groups of three vectors of length six to six groups of three degree-3 polynomials, where evaluating the polynomials at each x coordinate represents one of the constraints. That is, if we evaluate the polynomials at $x=1$, then we get our first set of vectors, if we evaluate the polynomials at $x=2$, then we get our second set of vectors, and so on. We can make this transformation using something called a `Lagrange interpolation`. For each $x$ coordinate, we can create a polynomial that has the desired $y$ coordinate at that $x$ coordinate and a $y$ coordinate of 0 at all the other $x$ coordinates we are interested in, and then to get the final result we add all of the polynomials together. 
 
-Taking the vector group $A$ as an example, we first need to calculate the polynomials corresponding to the first value of each $a$ vector for the four constraints. That is, we apply the Lagrange interpolation method to the first column of the vector group A, and find the polynomial that passes through the four points (1,0), (2,0), (3,0), and (4,5). We can use the online tool [Cubic Polynomial Generator](http://skisickness.com/2010/04/28/) to solve this, or write a script ourselves. The resulting polynomial is as follows:  
+Taking the vector group $A$ as an example, we first need to calculate the polynomials corresponding to the first value of each $a$ vector for the four constraints. That is, we apply the Lagrange interpolation method to the first column of the vector group A, and find the polynomial that passes through the four points $(1,0), (2,0), (3,0), and (4,5)$. We can use the online tool [Cubic Polynomial Generator](http://skisickness.com/2010/04/28/) to solve this, or write a script ourselves. The resulting polynomial is as follows:  
 
 $$y_1 = -5 + 9.166x - 5x^2 + 0.833x^3$$
 
@@ -247,7 +247,7 @@ where $H$ must is a result of division without any remainder.
 
 
 >Finally, based on the QAP transformation process described above, we can gain a deeper understanding of why QAP is needed: 
-If the vector $s$ is not known, one can only randomly choose a vector $s$, compute the QAP polynomial, and then check if $Z(x)$ satisfies the divisibility relationship. If it satisfies, the solution is accepted; otherwise, it is rejected. Therefore, it would take exponential time for adversary to brute force search for the vector $s$. However, once the witness vector $s$ is given, it is possible to quickly construct the QAP polynomial based on $s$ and efficiently verify if $Z(x)$ satisfies the divisibility relationship with the constructed QAP polynomial. Thus, the divisibility relationship between the polynomial $Z(x)$ and the QAP/QSP polynomial, satisfying singularity, constitutes an NP problem. In this way, we can better conceal the $s$. That is the magic of Zero knowledge proof.
+If the vector $s$ is not known, one can only randomly choose a vector $s$, compute the QAP polynomial, and then check if $Z(x)$ satisfies the divisibility relationship. If it satisfies, the solution is accepted; otherwise, it is rejected. Therefore, it would take exponential time for adversary to brute force search for the vector $s$. However, once the prover give the witness vector $s$, it is possible to quickly construct the QAP polynomial based on $s$ and efficiently verify if $Z(x)$ satisfies the divisibility relationship with the constructed QAP polynomial. Thus, the divisibility relationship between the polynomial $Z(x)$ and the QAP polynomial, satisfying singularity, constitutes an NP problem. In this way, we can better conceal the $s$ while the adversary is unable to forge a proof. That is the magic of Zero knowledge proof.
 
 ## Generate proof
 In ZK-SNARKS, the process of generating a proof is typically performed using the proof algorithm of a zero-knowledge proof system, which allows a prover to prove the truth of a statement or assertion to a verifier without revealing any other information about the statement or assertion.
