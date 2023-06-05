@@ -101,7 +101,7 @@ B = [0, 1, 0, 0, 0, 0]
 C = [0, 0, 0, 1, 0, 0]
 ```
 
-Also, for the second gate: `y = sym_1 * x`: 
+Also, for the second gate: `y = sym_1 * x`:     
 ![constraint02](./img/constraint02.jpg)
 
 We can get the triple:
@@ -112,7 +112,7 @@ B = [0, 1, 0, 0, 0, 0]
 C = [0, 0, 0, 0, 1, 0]
 ```
 
-For the third gate: `sym_2 = y + x`:
+For the third gate: `sym_2 = y + x`:      
 ![constraint03](./img/constraint03.jpg)
 
 We can get the triple:
@@ -122,7 +122,7 @@ B = [1, 0, 0, 0, 0, 0]
 C = [0, 0, 0, 0, 0, 1]
 ```
 
-For the fourth gate: `~out = sym_2 + 5`:
+For the fourth gate: `~out = sym_2 + 5`:     
 ![constraint04](./img/constraint04.jpg)
 
 We can get the triple:
