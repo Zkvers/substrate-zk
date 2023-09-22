@@ -27,7 +27,7 @@ The core of the Groth16 protocol is to use bilinear mapping to transform the pro
 ## Principle of the Protocol
 > This part will involve some theoretical mathematical calculations and formulas. We hope you can patiently read through them and also present to you in a relatively concise form. Of course, if you find it difficult to continue, you can directly skip to the practical part below. After completing all the practices, you can come back to better understand the theoretical part.
 
-Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS preview article. Here, we will take a quick review of these steps. A zk-SNARKs protocol framework consists of the following steps:
+Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS [preview article](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md). Here, we will take a quick review of these steps. A zk-SNARKs protocol framework consists of the following steps:
 
 1. Prover 𝓟 wants to prove that he has witness $w$ that satisfies a computation relation 𝑹.
 2. Prover 𝓟 wants to prove that he has witness $w$ that satisfies 𝑹's corresponding arithmetic circuit.
