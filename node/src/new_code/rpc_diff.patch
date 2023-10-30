@@ -1,8 +1,0 @@
-11c11
-< use node_template_runtime::{opaque::Block, AccountId, Balance, Index};
----
-> use node_template_runtime::{opaque::Block, AccountId, Balance, Nonce};
-37c37
-< 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
----
-> 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
