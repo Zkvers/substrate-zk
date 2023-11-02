@@ -155,6 +155,8 @@ In the previous practice, you have run `./start.sh Multiplication` command. We w
 snarkjs powersoftau new bls12_381 12 pot12_0000.ptau -v
 ```
 The first parameter after new refers to the type of curve you wish to use. At the moment, we use `bls12-381` and in this way, we can adapt to Bellman very well which also using this curve.
+The second parameter, in this case 12, is the power of two of the maximum number of constraints that the ceremony can accept: in this case, the number of constraints is 2 ^ 12 = 4096(Because the number of constraints we are testing here is not large, we chose 12. If your number of constraints is larger, you can choose a larger value.). The maximum value supported here is 28, which means you can use snarkjs to securely generate zk-snark parameters for circuits with up to 2 ^ 28 (≈268 million) constraints.
+
 
 2. contribute to the `powers of tau ceremony` and prepare circuit
 ```shell
@@ -162,17 +164,38 @@ The first parameter after new refers to the type of curve you wish to use. At th
 snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v
 snarkjs powersoftau contribute pot12_0001.ptau pot12_0002.ptau --name="Second contribution" -v -e="some random text"
 snarkjs powersoftau export challenge pot12_0002.ptau challenge_0003
+```
+> Here, we export the challenge for the third contributor and it allows you to use different types of software in a single ceremony which will be more secure.
+```shell
 snarkjs powersoftau challenge contribute bls12_381 challenge_0003 response_0003 -e="some random text"
 snarkjs powersoftau import response pot12_0002.ptau response_0003 pot12_0003.ptau -n="Third contribution name"
 
 # verify the ptau
 snarkjs powersoftau verify pot12_0003.ptau
 snarkjs powersoftau beacon pot12_0003.ptau pot12_beacon.ptau 0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f 10 -n="Final Beacon"
+```
+The `beacon` command creates a `ptau` file with a contribution applied in the form of a random beacon.
 
+We need to apply a random beacon in order to finalise the first phase of trusted setup.
+
+>To paraphrase Sean Bowe and Ariel Gabizon, a random beacon is a source of public randomness that is not available before a fixed time. The beacon itself can be a delayed hash function (e.g. 2^40 iterations of SHA256) evaluated on some high entropy and publicly available data. Possible sources of data include: the closing value of the stock market on a certain date in the future, the output of a selected set of national lotteries, or the value of a block at a particular height in one or more blockchains. E.g. the hash of the 11 millionth Ethereum block (which as of this writing is some 3 months in the future). See [here](https://eprint.iacr.org/2017/1050.pdf) for more on the importance of a random beacon.
+
+For the purposes of this tutorial, the beacon is essentially a delayed hash function evaluated on `0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f` (in practice this value will be some form of high entropy and publicly available data of your choice). The next input -- in our case `10` -- just tells snarkjs to perform `2 ^ 10` iterations of this hash function.
+
+Note that security holds even if an adversary has limited influence on the beacon.
+
+```shell
 # prepare the phase 2 (ceremony with circuit) 
 snarkjs powersoftau prepare phase2 pot12_beacon.ptau pot12_final.ptau -v
+```
+We're now ready to prepare phase 2 of the setup (the circuit-specific phase).
+
+Under the hood, the `prepare phase2` command calculates the encrypted evaluation of the Lagrange polynomials at tau for `tau`, `alpha*tau` and `beta*tau`. It takes the beacon `ptau` file we generated in the previous step, and outputs a final `ptau` file which will be used to generate the circuit proving and verification keys.
+
+```shell
 snarkjs powersoftau verify pot12_final.ptau
 ```
+> The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.
 
 3. compile the cicuit and run circuit ceremony
 
@@ -183,6 +206,7 @@ The circom command takes one input (the circuit to compile, in our case circuit.
 ```shell
   circom circuit.circom --r1cs --wasm --sym -p bls12381
 ```
+> `-p` params is the target curve to generate r1cs constrains, it tells circom which fields the polynomials are interpolated in.
 
 print some information about the circuit and create the `witness` (values of all the wires) for our inputs.
 ```shell
@@ -240,16 +264,16 @@ In the last, we use the snarkjs to verify the proof
 snarkjs groth16 verify verification_key.json public.json proof.json
 ```
 
-Okay, so far, we have learned about the process of generating a proof using snarkjs and verifying the proof using bellman. The next step is to use bellman to verify the proof generated by snarkjs on the substrate-based chain, which is our ultimate goal.
+Okay, so far, we have learned about the process of generating a proof with snarkjs and verifying the proof with bellman. The next step is to use bellman to verify the proof generated by snarkjs on the substrate-based chain, which is our ultimate goal.
 
 ### Verify the proof by bellman on substrate
-1. start the substrate chain  
+1. start the substrate chain
 go to the dir `~/..../substrate-zk`
 ```
 ./target/release/node-template --dev --tmp
 ```
 
-2. get the proof and verification key   
+2. get the proof and verification key
 If you have run all the practice before, go to dir `snarkjs-bellman-adapter/circuit/Multiplication`, you can find two file `proof_hex.json` and `vkey_hex.json` which we will use in the next step.
 
 For example, My proof_hex.json is:
@@ -274,7 +298,7 @@ vkey_hex.json is:
 ```
 > Of course, the generated proof is different each time. You can follow the steps below based on your actual file content.
 
-3. set zk parameter on substrate-based chain    
+3. set zk parameter on substrate-based chain
 We can open the PolkadotJS browser, and then navigate to the `verifier` pallet, and select the method `setZkKeys`, like this:
 ![set zk parameter](../../img/set_zk_parameters.jpg)
 
