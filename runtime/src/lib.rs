@@ -252,8 +252,6 @@ impl pallet_balances::Config for Runtime {
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
-	// (TODO: idk it is not a member of trait `pallet_balances::Config`)
-	// type RuntimeFreezeReason = ();
 	type MaxHolds = ();
 }
 
@@ -281,28 +279,10 @@ impl pallet_insecure_randomness_collective_flip::Config for Runtime {}
 /// Configure the pallet-verifier in pallets/verifier.
 impl pallet_verifier::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	// (TODO: present in the new node template)
+	// this type is present in the newer node template,
+	// probably usless until working on benchmarks
 	//type WeightInfo = pallet_template::weights::SubstrateWeight<Runtime>;
 }
-
-// (TODO: comments present in the old version of the runtime/src/lib.rs)
-/* parameter_types! {
-	// One storage item; key size is 32; value is size 4+4+16+32 bytes = 56 bytes.
-	pub const DepositBase: Balance = 8800000;
-	// Additional storage item size of 32 bytes.
-	pub const DepositFactor: Balance = 3200000;
-	pub const MaxSignatories: u16 = 100;
-}
-
-impl pallet_multisig::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type Call = Call;
-	type Currency = Balances;
-	type DepositBase = DepositBase;
-	type DepositFactor = DepositFactor;
-	type MaxSignatories = MaxSignatories;
-	type WeightInfo = weights::pallet_multisig::WeightInfo<Runtime>;
-} */
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
