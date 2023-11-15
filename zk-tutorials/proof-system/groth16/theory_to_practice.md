@@ -27,7 +27,7 @@ The core of the Groth16 protocol is to use bilinear mapping to transform the pro
 ## Principle of the Protocol
 > This part will involve some theoretical mathematical calculations and formulas. We hope you can patiently read through them and also present to you in a relatively concise form. Of course, if you find it difficult to continue, you can directly skip to the practical part below. After completing all the practices, you can come back to better understand the theoretical part.
 
-Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS [preview article](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md). Here, we will take a quick review of these steps. A zk-SNARKs protocol framework consists of the following steps:
+Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS [preview article](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md). Here, we will summarize them in more detail. A zk-SNARKs protocol framework consists of the following steps:
 
 1. Prover 𝓟 wants to prove that he has witness $w$ that satisfies a computation relation 𝑹.
 2. Prover 𝓟 wants to prove that he has witness $w$ that satisfies 𝑹's corresponding arithmetic circuit.
@@ -69,7 +69,7 @@ The CRS (Common Reference String) is divided into two sets. The part needed for 
 $$(\alpha, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1}, L_{l+1}(\tau)/\delta, L_{l+2}(\tau)/\delta, \dots, L_m(\tau)/\delta, Z(\tau)/\delta, \tau\cdot Z(\tau)/\delta, \tau^2\cdot Z(\tau)/\delta, \dots, \tau^{n-2}\cdot Z(\tau)/\delta)_{1}$$
 
 * Values related to G2:
-$$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$
+$$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$ [skalman](# "this is the first time you talk about G1 and G2, please explain")
 
 
 Here G1，G2 are two groups in elliptic curve bilinear pairing and values in the parentheses are actually group elements scalar multiplied by the group generator and subscripts of these values indicate which group they are from.
@@ -99,7 +99,7 @@ $A1 = \alpha_1 + w_0A_0(\tau)_1 + w_1A_1(\tau)_1 + w_2A_2(\tau)_1 + w_3A_3(\tau)
 
 $A_i(\tau)\cdot g_1$ can be calculated from the coefficients of $A_i(x)$ by multiplying each coefficient with the corresponding term $g_1, \tau\cdot g_1, \tau^2\cdot g_1, \ldots$, which are points made available by the CRS (common reference string).
 
-* $B2$ is a point in G2:
+* $B2$ is a point in G2: [skalman](# "your definition here is recursive you have B_2 on both side, you really need a better notation")
 
 $B2 = \beta_2 + w_0B_0(\tau)_2 + w_1B_1(\tau)_2 + w_2B_2(\tau)_2 + w_3B_3(\tau)_2 + \dots + w_mB_m(\tau)_2 + s\delta_2$
 
@@ -111,6 +111,8 @@ $C1 = w_{l+1}\cdot(L_{l+1}(\tau)/\delta)_1 + \dots + w_m\cdot(L_m(\tau)/\delta)_
 $H(\tau)\cdot Z(\tau)/\delta \cdot g_1$ can be calculated from the coefficients of $H(x)$ by multiplying each coefficient with the corresponding term $(Z(\tau)/\delta) \cdot g_1, (\tau\cdot Z(\tau)/\delta) \cdot g_1,(\tau^2\cdot Z(\tau)/\delta) \cdot g_1, \ldots$, which are points made available by the CRS (common reference string).
 
 The quotient polynomial $H(x)$ can be calculated by applying vector dot product operations between witness vector $w$ and polynomial vectors $A(x)$, $B(x)$, and $C(x)$. Then we have $H(x) = [w\cdot A(x) \cdot w\cdot B(x) - w\cdot C(x)] / Z(x)$.
+
+ [skalman](# "Why did you drop computation of B1? $B1$ in $G1$: $B_1 = \beta_1 + w_0B_0(\tau)_1 + w_1B_1(\tau)_1 + \dots + w_mB_m(\tau)_1 + s\delta_1$.")
 
 
 ## Proof Verification
@@ -138,13 +140,13 @@ $= \alpha \cdot \beta + \beta \cdot A(\tau) + \alpha \cdot B(\tau) + C(\tau) + H
 $= C(\tau) + H(\tau) \cdot Z(\tau) + \alpha \cdot \beta + \alpha \cdot B(\tau) + \beta \cdot A(\tau) + s\alpha\delta + sA(\tau)\delta + r\beta\delta + rB(\tau) \cdot \delta + s \cdot r\delta\delta$
 
 
-As you can see,  the terms followed after $A(\tau) \cdot B(\tau)$ in $A \cdot B$ are identical to terms followed after  $C(\tau) + H(\tau) \cdot Z(\tau)$ in the right side of the equation. Thereby, in this equation, they can be canceled out. If the above equality holds, it means that:
+As you can see,  the terms followed after $A(\tau) \cdot B(\tau)$ in $A \cdot B$ are identical to terms followed after  $C(\tau) + H(\tau) \cdot Z(\tau)$ in the right side of the equation. Thereby, in this equation, they can be canceled out. If the above equality holds, it means that [skalman](# "you need to define the pairing operation here and show when and why the verifier needs to apply the pairing"):
 
 $A(\tau) \cdot B(\tau) = C(\tau) + H(\tau) \cdot Z(\tau)$
 
 Ok, verification succeeds. The prover does have a valid witness $w$.
 
-## Practice1: Multilication
+## Practice1: Multilication 
 In the first example, we start with the simplest `multiplication` case "a * b = c". The public input is `c`, and the prover needs to prove to someone else that he know two values `a` and `b`, whose product is c, without revealing the values of a and b. You can go to directory `substrate-zk/snarkjs-bellman-adapter` to refer to its readme, complete `Pre-requirements` and `Use the adapter` section, and then come back here. I will explain to you what happens in the process and then show you how to verify the proof generated by snarkjs on our substrate-based chain with bellman.
 
 ### Generate a proof by snarkjs 
