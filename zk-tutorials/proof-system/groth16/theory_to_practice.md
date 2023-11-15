@@ -160,6 +160,7 @@ The first parameter after new refers to the type of curve you wish to use. At th
 The second parameter, in this case 12, is the power of two of the maximum number of constraints that the ceremony can accept: in this case, the number of constraints is 2 ^ 12 = 4096(Because the number of constraints we are testing here is not large, we chose 12. If your number of constraints is larger, you can choose a larger value.). The maximum value supported here is 28, which means you can use snarkjs to securely generate zk-snark parameters for circuits with up to 2 ^ 28 (≈268 million) constraints.
 
 
+[skalman](# "could you explain what is 12 and why you have chosen to stop at power 12?")
 2. contribute to the `powers of tau ceremony` and prepare circuit
 ```shell
 # contribute to the ceremony
@@ -172,6 +173,7 @@ snarkjs powersoftau export challenge pot12_0002.ptau challenge_0003
 snarkjs powersoftau challenge contribute bls12_381 challenge_0003 response_0003 -e="some random text"
 snarkjs powersoftau import response pot12_0002.ptau response_0003 pot12_0003.ptau -n="Third contribution name"
 
+[skalman](# "could you explain why you export the challenge for the third contributor")
 # verify the ptau
 snarkjs powersoftau verify pot12_0003.ptau
 snarkjs powersoftau beacon pot12_0003.ptau pot12_beacon.ptau 0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f 10 -n="Final Beacon"
@@ -197,7 +199,7 @@ Under the hood, the `prepare phase2` command calculates the encrypted evaluation
 ```shell
 snarkjs powersoftau verify pot12_final.ptau
 ```
-> The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.
+The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.[skalman](# "that still does not  explain what happens in the phase2 of the cermony ")
 
 3. compile the cicuit and run circuit ceremony
 
@@ -208,7 +210,7 @@ The circom command takes one input (the circuit to compile, in our case circuit.
 ```shell
   circom circuit.circom --r1cs --wasm --sym -p bls12381
 ```
-> `-p` params is the target curve to generate r1cs constrains, it tells circom which fields the polynomials are interpolated in.
+`-p` params is the target curve to generate r1cs constrains, it tells circom which fields the polynomials are interpolated in.
 
 print some information about the circuit and create the `witness` (values of all the wires) for our inputs.
 ```shell
