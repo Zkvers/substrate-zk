@@ -5,10 +5,10 @@ The [Groth16](https://eprint.iacr.org/2016/260.pdf) algorithm is a non-interacti
 Groth16 solves the problem of how to perform zero-knowledge proofs for complex computations. In zero-knowledge proof, the prover wishes to prove a statement about private inputs to the verifier, without revealing any information about the inputs themselves. This input is usually referred to as witness in ZkSnark. It is a solution satisfying certain conditions. The Groth16 proof system allows the prover to create a proof that they know a solution without revealing the actual solution to the verifier. As we previously introduced the basic concept of ZKSNARK(zero-knowledge succinct non-interactive argument of knowledge), it is a specific algorithm implementation of ZKSNARK.
 
 ### Features:
-- **Non-interactive**: Groth16 is a non-interactive proof system, meaning that interaction is not needed between the prover and the verifier.
-- **Short proofs**: Groth16 proofs are short, with a constant size of a few hundred bytes, which remains independent of the complexity of the proof.
-- **Fast verification**: Groth16 proofs can be verified efficiently in polynomial time.
-- **Trusted setup**: Groth16 requires a trusted setup phase for generating common parameters.
+- **Non-interactive**: Groth16 is a non-interactive proof system, meaning that only one communication is needed between the prover and the verifier.
+- **Short proofs**: Groth16 proofs are short, with a size of only O(1), independent of the complexity of the proof.
+- **Fast verification**: Groth16 proofs can be verified in polynomial time.
+- **Trusted setup**: Groth16 requires a trusted setup phase for generating common parameters.[skalman](# "arguably this is not a feature, this is a limitation, maybe you should move it to limitation section")
 - **Applicable to any NP problem**: Groth16 proof system can construct zero-knowledge proofs for any NP problem.
 
 ## Protocol flow
@@ -22,7 +22,7 @@ Groth16 protocol is based on bilinear mapping and elliptic curve cryptography. T
 
 * **preprocessing**（optional）, some computations related to the public parameters can be preprocessed to improve verification efficiency and speed up the process, especially for large computations and multiple proof verification scenarios.
 
-The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple bilinear mapping calculations to verify the correctness of the proof.
+The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple bilinear mapping calculations to verify the correctness of the proof. [skalman](# "this is inaccurate, For one, you are explaining the KZG commitment. Groth16 contribution is to reduce the number of pairing. Further more the problem is not in `the elliptic curve group` it is in a finite field. KZG transform it to the elliptic curve group and use pairing (bilinear mapping) to enable verifier to verifies the prover's claim"). 
 
 ## Principle of the Protocol
 > This part will involve some theoretical mathematical calculations and formulas. We hope you can patiently read through them and also present to you in a relatively concise form. Of course, if you find it difficult to continue, you can directly skip to the practical part below. After completing all the practices, you can come back to better understand the theoretical part.
