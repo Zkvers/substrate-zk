@@ -5,9 +5,9 @@ The [Groth16](https://eprint.iacr.org/2016/260.pdf) algorithm is a non-interacti
 Groth16 solves the problem of how to perform zero-knowledge proofs for complex computations. In zero-knowledge proof, the prover wishes to prove a statement about private inputs to the verifier, without revealing any information about the inputs themselves. This input is usually referred to as witness in ZkSnark. It is a solution satisfying certain conditions. The Groth16 proof system allows the prover to create a proof that they know a solution without revealing the actual solution to the verifier. As we previously introduced the basic concept of ZKSNARK(zero-knowledge succinct non-interactive argument of knowledge), it is a specific algorithm implementation of ZKSNARK.
 
 ### Features:
-- **Non-interactive**: Groth16 is a non-interactive proof system, meaning that interaction is not needed between the prover and the verifier.
-- **Short proofs**: Groth16 proofs are short, with a constant size of a few hundred bytes, which remains independent of the complexity of the proof.
-- **Fast verification**: Groth16 proofs can be verified efficiently in polynomial time.
+- **Non-interactive**: Groth16 is a non-interactive proof system, meaning that only one communication is needed between the prover and the verifier.
+- **Short proofs**: Groth16 proofs are short, with a size of only O(1), independent of the complexity of the proof.
+- **Fast verification**: Groth16 proofs can be verified in polynomial time.
 - **Trusted setup**: Groth16 requires a trusted setup phase for generating common parameters.
 - **Applicable to any NP problem**: Groth16 proof system can construct zero-knowledge proofs for any NP problem.
 
@@ -22,12 +22,12 @@ Groth16 protocol is based on bilinear mapping and elliptic curve cryptography. T
 
 * **preprocessing**（optional）, some computations related to the public parameters can be preprocessed to improve verification efficiency and speed up the process, especially for large computations and multiple proof verification scenarios.
 
-The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple bilinear mapping calculations to verify the correctness of the proof.
+The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem and reduce the number of pairing. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple pairing (bilinear mapping) calculations in a finite field to verify the correctness of the proof.
 
 ## Principle of the Protocol
 > This part will involve some theoretical mathematical calculations and formulas. We hope you can patiently read through them and also present to you in a relatively concise form. Of course, if you find it difficult to continue, you can directly skip to the practical part below. After completing all the practices, you can come back to better understand the theoretical part.
 
-Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS [preview article](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md). Here, we will take a quick review of these steps. A zk-SNARKs protocol framework consists of the following steps:
+Let's review the construction steps of zk-SNARKs as introduced in the ZKSANRKS [preview article](https://github.com/Zkvers/substrate-zk/blob/master/zk-tutorials/ZKSNARKS.md). Here, we will summarize them in more detail. A zk-SNARKs protocol framework consists of the following steps:
 
 1. Prover 𝓟 wants to prove that he has witness $w$ that satisfies a computation relation 𝑹.
 2. Prover 𝓟 wants to prove that he has witness $w$ that satisfies 𝑹's corresponding arithmetic circuit.
@@ -71,8 +71,7 @@ $$(\alpha, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1}, L_{l+1}(\tau)/\de
 * Values related to G2:
 $$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$
 
-
-Here G1，G2 are two groups in elliptic curve bilinear pairing and values in the parentheses are actually group elements scalar multiplied by the group generator and subscripts of these values indicate which group they are from.
+>Here G1，G2 are two groups in elliptic curve bilinear pairing and values in the parentheses are actually group elements scalar multiplied by the group generator and subscripts of these values indicate which group they are from.
 
 Elliptic cure pairing are used in Groth16 to check  equations on multiplications without revealing the hidden values. Assume the generators of G1, G2 are $g1, g2$ respectively and function $e$ is the bilinear mapping that maps two group elements, one in G1 and one in G2, to an element in a new group Gt. For example, if you want to check $a \times b =c$ without revealing $a,b,c$, you can simply check $e(a \cdot g1, b \cdot g2) = e(c \cdot g1, g2)$. More explainations about [bilinear pairing](https://alinush.github.io/2022/12/31/pairings-or-bilinear-maps.html). 
 
@@ -112,6 +111,8 @@ $H(\tau)\cdot Z(\tau)/\delta \cdot g_1$ can be calculated from the coefficients 
 
 The quotient polynomial $H(x)$ can be calculated by applying vector dot product operations between witness vector $w$ and polynomial vectors $A(x)$, $B(x)$, and $C(x)$. Then we have $H(x) = [w\cdot A(x) \cdot w\cdot B(x) - w\cdot C(x)] / Z(x)$.
 
+We also need to calculate $B1$ in $G1$: $B_1 = \beta_1 + w_0B_0(\tau)_1 + w_1B_1(\tau)_1 + \dots + w_mB_m(\tau)_1 + s\delta_1$
+
 
 ## Proof Verification
 
@@ -142,7 +143,10 @@ As you can see,  the terms followed after $A(\tau) \cdot B(\tau)$ in $A \cdot B$
 
 $A(\tau) \cdot B(\tau) = C(\tau) + H(\tau) \cdot Z(\tau)$
 
-Ok, verification succeeds. The prover does have a valid witness $w$.
+As you can see, Groth16 does not use the “knowledge of coefficient” (that requires in the proof two group elements for each polynomial) , but uses the secret field elements $\alpha$, $\beta$ to force $A1$, $B2$ and $C1$ to use the same vector $w$. The other two secret field elements $γ$, $δ$ are used to make the public input independent from the other witness components. So that is why the verifier can apply the pairing to verify the proof.
+
+Ok, if the verification succeeds, the prover does have a valid witness $w$.
+
 
 ## Practice1: Multilication
 In the first example, we start with the simplest `multiplication` case "a * b = c". The public input is `c`, and the prover needs to prove to someone else that he know two values `a` and `b`, whose product is c, without revealing the values of a and b. You can go to directory `substrate-zk/snarkjs-bellman-adapter` to refer to its readme, complete `Pre-requirements` and `Use the adapter` section, and then come back here. I will explain to you what happens in the process and then show you how to verify the proof generated by snarkjs on our substrate-based chain with bellman.
@@ -165,12 +169,14 @@ snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First con
 snarkjs powersoftau contribute pot12_0001.ptau pot12_0002.ptau --name="Second contribution" -v -e="some random text"
 snarkjs powersoftau export challenge pot12_0002.ptau challenge_0003
 ```
-> Here, we export the challenge for the third contributor and it allows you to use different types of software in a single ceremony which will be more secure.
+
 ```shell
 snarkjs powersoftau challenge contribute bls12_381 challenge_0003 response_0003 -e="some random text"
 snarkjs powersoftau import response pot12_0002.ptau response_0003 pot12_0003.ptau -n="Third contribution name"
-
+```
+Here, we export the challenge for the third contributor and it allows you to use different types of software in a single ceremony which will be more secure.
 # verify the ptau
+```
 snarkjs powersoftau verify pot12_0003.ptau
 snarkjs powersoftau beacon pot12_0003.ptau pot12_beacon.ptau 0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f 10 -n="Final Beacon"
 ```
@@ -195,7 +201,7 @@ Under the hood, the `prepare phase2` command calculates the encrypted evaluation
 ```shell
 snarkjs powersoftau verify pot12_final.ptau
 ```
-> The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.
+The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.
 
 3. compile the cicuit and run circuit ceremony
 
@@ -206,7 +212,7 @@ The circom command takes one input (the circuit to compile, in our case circuit.
 ```shell
   circom circuit.circom --r1cs --wasm --sym -p bls12381
 ```
-> `-p` params is the target curve to generate r1cs constrains, it tells circom which fields the polynomials are interpolated in.
+`-p` params is the target curve to generate r1cs constrains, it tells circom which fields the polynomials are interpolated in.
 
 print some information about the circuit and create the `witness` (values of all the wires) for our inputs.
 ```shell
