@@ -8,7 +8,11 @@ Groth16 solves the problem of how to perform zero-knowledge proofs for complex c
 - **Non-interactive**: Groth16 is a non-interactive proof system, meaning that only one communication is needed between the prover and the verifier.
 - **Short proofs**: Groth16 proofs are short, with a size of only O(1), independent of the complexity of the proof.
 - **Fast verification**: Groth16 proofs can be verified in polynomial time.
+<<<<<<< HEAD
 - **Trusted setup**: Groth16 requires a trusted setup phase for generating common parameters.
+=======
+- **Trusted setup**: Groth16 requires a trusted setup phase for generating common parameters.[skalman](# "arguably this is not a feature, this is a limitation, maybe you should move it to limitation section")
+>>>>>>> d97ad9fe728564fc5ebcb0d7328d0f3a37d005bf
 - **Applicable to any NP problem**: Groth16 proof system can construct zero-knowledge proofs for any NP problem.
 
 ## Protocol flow
@@ -22,7 +26,11 @@ Groth16 protocol is based on bilinear mapping and elliptic curve cryptography. T
 
 * **preprocessing**（optional）, some computations related to the public parameters can be preprocessed to improve verification efficiency and speed up the process, especially for large computations and multiple proof verification scenarios.
 
+<<<<<<< HEAD
 The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem and reduce the number of pairing. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple pairing (bilinear mapping) calculations in a finite field to verify the correctness of the proof.
+=======
+The core of the Groth16 protocol is to use bilinear mapping to transform the problem from the elliptic curve group to a scalar problem. In this way, the prover can provide a zero-knowledge proof about the computation, and the verifier only needs to perform simple bilinear mapping calculations to verify the correctness of the proof. [skalman](# "this is inaccurate, For one, you are explaining the KZG commitment. Groth16 contribution is to reduce the number of pairing. Further more the problem is not in `the elliptic curve group` it is in a finite field. KZG transform it to the elliptic curve group and use pairing (bilinear mapping) to enable verifier to verifies the prover's claim"). 
+>>>>>>> d97ad9fe728564fc5ebcb0d7328d0f3a37d005bf
 
 ## Principle of the Protocol
 > This part will involve some theoretical mathematical calculations and formulas. We hope you can patiently read through them and also present to you in a relatively concise form. Of course, if you find it difficult to continue, you can directly skip to the practical part below. After completing all the practices, you can come back to better understand the theoretical part.
@@ -69,7 +77,7 @@ The CRS (Common Reference String) is divided into two sets. The part needed for 
 $$(\alpha, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1}, L_{l+1}(\tau)/\delta, L_{l+2}(\tau)/\delta, \dots, L_m(\tau)/\delta, Z(\tau)/\delta, \tau\cdot Z(\tau)/\delta, \tau^2\cdot Z(\tau)/\delta, \dots, \tau^{n-2}\cdot Z(\tau)/\delta)_{1}$$
 
 * Values related to G2:
-$$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$
+$$(\beta, \delta, 1, \tau, \tau^2, \tau^3, \dots, \tau^{n-1})_{2}$$ [skalman](# "this is the first time you talk about G1 and G2, please explain")
 
 >Here G1，G2 are two groups in elliptic curve bilinear pairing and values in the parentheses are actually group elements scalar multiplied by the group generator and subscripts of these values indicate which group they are from.
 
@@ -98,7 +106,7 @@ $A1 = \alpha_1 + w_0A_0(\tau)_1 + w_1A_1(\tau)_1 + w_2A_2(\tau)_1 + w_3A_3(\tau)
 
 $A_i(\tau)\cdot g_1$ can be calculated from the coefficients of $A_i(x)$ by multiplying each coefficient with the corresponding term $g_1, \tau\cdot g_1, \tau^2\cdot g_1, \ldots$, which are points made available by the CRS (common reference string).
 
-* $B2$ is a point in G2:
+* $B2$ is a point in G2: [skalman](# "your definition here is recursive you have B_2 on both side, you really need a better notation")
 
 $B2 = \beta_2 + w_0B_0(\tau)_2 + w_1B_1(\tau)_2 + w_2B_2(\tau)_2 + w_3B_3(\tau)_2 + \dots + w_mB_m(\tau)_2 + s\delta_2$
 
@@ -111,7 +119,11 @@ $H(\tau)\cdot Z(\tau)/\delta \cdot g_1$ can be calculated from the coefficients 
 
 The quotient polynomial $H(x)$ can be calculated by applying vector dot product operations between witness vector $w$ and polynomial vectors $A(x)$, $B(x)$, and $C(x)$. Then we have $H(x) = [w\cdot A(x) \cdot w\cdot B(x) - w\cdot C(x)] / Z(x)$.
 
+<<<<<<< HEAD
 We also need to calculate $B1$ in $G1$: $B_1 = \beta_1 + w_0B_0(\tau)_1 + w_1B_1(\tau)_1 + \dots + w_mB_m(\tau)_1 + s\delta_1$
+=======
+ [skalman](# "Why did you drop computation of B1? $B1$ in $G1$: $B_1 = \beta_1 + w_0B_0(\tau)_1 + w_1B_1(\tau)_1 + \dots + w_mB_m(\tau)_1 + s\delta_1$.")
+>>>>>>> d97ad9fe728564fc5ebcb0d7328d0f3a37d005bf
 
 
 ## Proof Verification
@@ -139,7 +151,7 @@ $= \alpha \cdot \beta + \beta \cdot A(\tau) + \alpha \cdot B(\tau) + C(\tau) + H
 $= C(\tau) + H(\tau) \cdot Z(\tau) + \alpha \cdot \beta + \alpha \cdot B(\tau) + \beta \cdot A(\tau) + s\alpha\delta + sA(\tau)\delta + r\beta\delta + rB(\tau) \cdot \delta + s \cdot r\delta\delta$
 
 
-As you can see,  the terms followed after $A(\tau) \cdot B(\tau)$ in $A \cdot B$ are identical to terms followed after  $C(\tau) + H(\tau) \cdot Z(\tau)$ in the right side of the equation. Thereby, in this equation, they can be canceled out. If the above equality holds, it means that:
+As you can see,  the terms followed after $A(\tau) \cdot B(\tau)$ in $A \cdot B$ are identical to terms followed after  $C(\tau) + H(\tau) \cdot Z(\tau)$ in the right side of the equation. Thereby, in this equation, they can be canceled out. If the above equality holds, it means that [skalman](# "you need to define the pairing operation here and show when and why the verifier needs to apply the pairing"):
 
 $A(\tau) \cdot B(\tau) = C(\tau) + H(\tau) \cdot Z(\tau)$
 
@@ -148,7 +160,7 @@ As you can see, Groth16 does not use the “knowledge of coefficient” (that re
 Ok, if the verification succeeds, the prover does have a valid witness $w$.
 
 
-## Practice1: Multilication
+## Practice1: Multilication 
 In the first example, we start with the simplest `multiplication` case "a * b = c". The public input is `c`, and the prover needs to prove to someone else that he know two values `a` and `b`, whose product is c, without revealing the values of a and b. You can go to directory `substrate-zk/snarkjs-bellman-adapter` to refer to its readme, complete `Pre-requirements` and `Use the adapter` section, and then come back here. I will explain to you what happens in the process and then show you how to verify the proof generated by snarkjs on our substrate-based chain with bellman.
 
 ### Generate a proof by snarkjs 
@@ -162,6 +174,7 @@ The first parameter after new refers to the type of curve you wish to use. At th
 The second parameter, in this case 12, is the power of two of the maximum number of constraints that the ceremony can accept: in this case, the number of constraints is 2 ^ 12 = 4096(Because the number of constraints we are testing here is not large, we chose 12. If your number of constraints is larger, you can choose a larger value.). The maximum value supported here is 28, which means you can use snarkjs to securely generate zk-snark parameters for circuits with up to 2 ^ 28 (≈268 million) constraints.
 
 
+[skalman](# "could you explain what is 12 and why you have chosen to stop at power 12?")
 2. contribute to the `powers of tau ceremony` and prepare circuit
 ```shell
 # contribute to the ceremony
@@ -173,8 +186,13 @@ snarkjs powersoftau export challenge pot12_0002.ptau challenge_0003
 ```shell
 snarkjs powersoftau challenge contribute bls12_381 challenge_0003 response_0003 -e="some random text"
 snarkjs powersoftau import response pot12_0002.ptau response_0003 pot12_0003.ptau -n="Third contribution name"
+<<<<<<< HEAD
 ```
 Here, we export the challenge for the third contributor and it allows you to use different types of software in a single ceremony which will be more secure.
+=======
+
+[skalman](# "could you explain why you export the challenge for the third contributor")
+>>>>>>> d97ad9fe728564fc5ebcb0d7328d0f3a37d005bf
 # verify the ptau
 ```
 snarkjs powersoftau verify pot12_0003.ptau
@@ -201,7 +219,11 @@ Under the hood, the `prepare phase2` command calculates the encrypted evaluation
 ```shell
 snarkjs powersoftau verify pot12_final.ptau
 ```
+<<<<<<< HEAD
 The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.
+=======
+The `verify` command verifies a powers of tau file. Before we go ahead and create the circuit, we perform a final check and verify the final protocol transcript. Notice there is no longer a warning informing you that the file does not contain phase 2 precalculated values.[skalman](# "that still does not  explain what happens in the phase2 of the cermony ")
+>>>>>>> d97ad9fe728564fc5ebcb0d7328d0f3a37d005bf
 
 3. compile the cicuit and run circuit ceremony
 
